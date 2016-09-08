@@ -1,46 +1,84 @@
 #include "Snake.h"
 #include "Windows.h"
 
-SnakeGame::SnakeGame( const int gameWidth, const int gameHeight, const cv::Mat& headImg )
+SnakeGame::SnakeGame( const int tilesX, const int tilesY, const cv::Mat& headImg, const int sizeTile, const bool easyMode )
 {
-    m_gameWidth     = gameWidth;
-    m_gameHeight    = gameHeight;
+    m_tilesX = tilesX;
+    m_tilesY = tilesY;
 
-    cv::resize( headImg, m_headImg, cv::Size( 30, 30 ) );
+    m_bEasyMode = easyMode;
 
-    m_gameImg = cv::Mat( m_gameHeight, m_gameWidth, CV_8UC3, BLACK );
-    m_headPos = cv::Point2i( m_gameWidth / 2, m_gameHeight / 2 );
+    cv::resize( headImg, m_headImg, cv::Size( sizeTile, sizeTile ) );
+    cv::resize( headImg, m_tailImg, cv::Size( sizeTile / 2, sizeTile / 2 ) );
+
+    m_gameImg = cv::Mat( tilesY * sizeTile, tilesX * sizeTile, CV_8UC3, BLACK );
+    m_headPos = cv::Point2i( m_tilesX / 2, m_tilesY / 2 );
 }
 
 void SnakeGame::update()
 {
+    // timer and position change
+    if( m_bPause == false )
+    {
+        m_startTime         = clock();
+        m_bPause            = true;
+    }
+    else
+    {
+        clock_t end         = clock();
+        float elapsedTime   = ( float )( end - m_startTime ) / CLOCKS_PER_SEC;
+        if( elapsedTime > TIME_FOR_MOVE_IN_SEC )
+        {
+            m_bPause = false;
+
+            switch( m_movDir )
+            {
+            case LEFT:
+                m_headPos.x--;
+                break;
+            case RIGHT:
+                m_headPos.x++;
+                break;
+            case UP:
+                m_headPos.y--;
+                break;
+            case DOWN:
+                m_headPos.y++;
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    
+    // boundary check
+    if( m_bEasyMode )
+    {
+        if( m_headPos.x >= m_tilesX )
+            m_headPos.x = 0;
+        else if( m_headPos.x < 0 )
+            m_headPos.x = m_tilesX - 1;
+        if( m_headPos.y >= m_tilesY )
+            m_headPos.y = 0;
+        else if( m_headPos.y < 0 )
+            m_headPos.y = m_tilesY - 1;
+    }
+    else
+    {
+        if( m_headPos.x >= m_tilesX || m_headPos.x < 0 || m_headPos.y >= m_tilesY || m_headPos.y < 0 )
+        {
+            m_bGameOver = true;
+            return;
+        }
+    }
+
+    // key handling
     int keyCode = cv::waitKey( 1 );
     if( keyCode > 0 )
     {
         keyHandling( keyCode );
-        //return;
+        return;
     }
-
-    const int distToMove = m_headImg.rows;
-    switch( m_movDir )
-    {
-    case LEFT:
-        m_headPos.x -= distToMove;
-        break;
-    case RIGHT:
-        m_headPos.x += distToMove;
-        break;
-    case UP:
-        m_headPos.y -= distToMove;
-        break;
-    case DOWN:
-        m_headPos.y += distToMove;
-        break;
-    default:
-        break;
-    }
-
-    Sleep( 300 );
 }
 
 cv::Mat SnakeGame::getGameImg()
@@ -51,10 +89,12 @@ cv::Mat SnakeGame::getGameImg()
 
 void SnakeGame::drawScene()
 {
-    const int headRadius = m_headImg.rows / 2;
-
     m_gameImg.setTo( cv::Scalar( 0, 0, 0 ) );
-    m_headImg.copyTo( m_gameImg( cv::Rect( m_headPos.x - headRadius, m_headPos.y - headRadius, m_headImg.cols, m_headImg.rows ) ) );
+    //m_headImg.copyTo( m_gameImg( cv::Rect( m_headPos.x - headRadius, m_headPos.y - headRadius, m_headImg.cols, m_headImg.rows ) ) );
+    const int tileSize = m_headImg.rows;
+    const int x = m_headPos.x * tileSize;
+    const int y = m_headPos.y * tileSize;
+    m_headImg.copyTo( m_gameImg( cv::Rect( x, y, m_headImg.cols, m_headImg.rows ) ) );
 }
 
 void SnakeGame::keyHandling( const int keyCode )
@@ -77,11 +117,10 @@ void SnakeGame::keyHandling( const int keyCode )
     }
     else if( 27 == keyCode )
     {
-        m_gameOver = true;
+        m_bGameOver = true;
     }
-}
-
-void SnakeGame::init()
-{
-    
+    else if( 'e' == keyCode )
+    {
+        m_bEasyMode = !m_bEasyMode;
+    }
 }
