@@ -28,8 +28,9 @@ int main()
     vPlayerNames.push_back( "PAPA" );
 
     // add powerups
-    std::vector< powerUp > vPowerUps;
-    vPowerUps.push_back( powerUp( "rocket", cv::imread( "D:/Projects/_images_/rocket.png", 1 ), 10 ) );
+    std::vector< PowerUp > vPowerUps;
+    vPowerUps.push_back( PowerUp( "rocket", cv::imread( "D:/Projects/_images_/rocket.png", 1 ), 5, 10,
+                                  "D:\\Projects\\_sounds_\\rocketShowUp.wav", "D:\\Projects\\_sounds_\\rocketConsume.wav" ) );
 
     //TODO evtl teste einbauen, ob alles richtig geladen wurde...
 
