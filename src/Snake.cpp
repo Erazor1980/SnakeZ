@@ -197,7 +197,8 @@ void SnakeGame::resetGame()
 
     m_timeTillNextPU    = rand() % 10 + MIN_TIME_FOR_NEXT_PU;
     m_timeMove          = m_lastTimeMove;
-    //m_bActiveBoost      = false;
+    m_vPowerUps[ m_currPowerUp ].resetPowerUp();
+    m_bPUvisibleOrActive = false;
 }
 
 void SnakeGame::update()
@@ -210,6 +211,7 @@ void SnakeGame::update()
             if( key == 13 )         // enter = new game
             {
                 resetGame();
+                startGame();
                 m_bGameOver = false;
             }
             else if( key == 27 )    // esc = end game
@@ -476,6 +478,10 @@ void SnakeGame::drawScene()
     int x = m_headPos.x * m_tileSize;
     int y = m_headPos.y * m_tileSize;
     drawIntoTile( x, y, m_vPlayerImg[ m_currPlayerIdx ] );
+    if( m_vPowerUps[ m_currPowerUp ].boostOn() )    // red rectangle around the head if boost is active
+    {
+        cv::rectangle( m_gameImg, cv::Rect( x, y, m_vPlayerImg[ m_currPlayerIdx ].cols - 1, m_vPlayerImg[ m_currPlayerIdx ].rows - 1 ), RED, 3 );
+    }
 
     // draw food
     x = m_foodPos.x * m_tileSize;

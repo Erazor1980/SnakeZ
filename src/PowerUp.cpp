@@ -71,3 +71,9 @@ void PowerUp::boostEndTest( SnakeGame * pGame )
         m_bBoostOn = false;
     }
 }
+
+void PowerUp::resetPowerUp()
+{
+    m_bBoostOn = false;
+    m_bVisible = false;
+}

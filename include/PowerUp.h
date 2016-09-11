@@ -22,6 +22,13 @@ public:
     // check, if boost ends, if yes, disable its effect
     void boostEndTest( SnakeGame* pGame );
 
+    bool boostOn() const
+    {
+        return m_bBoostOn;
+    }
+
+    void resetPowerUp();
+
     cv::Point2i getPos() const
     {
         return m_pos;
