@@ -2,9 +2,9 @@
 #include "windows.h"
 #include <mmsystem.h>
 
-SnakeGame::SnakeGame( const int tilesX, const int tilesY, const cv::Mat& headImg,
-                      const std::vector< cv::Mat > vFoodItems, const std::vector< std::string > vFoodSounds,
-                      const int tileSize, const bool easyMode  )
+SnakeGame::SnakeGame( const int tilesX, const int tilesY, const std::vector< cv::Mat > vPlayerImg, const std::vector< std::string > vPlayerNames,
+                      const std::vector< cv::Mat > vFoodImg, const std::vector< std::string > vFoodSounds, const std::vector< powerUp > vPowerUps,
+                      const int tileSize, const bool easyMode )
 {
     std::srand( ( unsigned int )std::time( 0 ) );
 
@@ -14,19 +14,31 @@ SnakeGame::SnakeGame( const int tilesX, const int tilesY, const cv::Mat& headImg
     m_bEasyMode     = easyMode;
     mp_tailParts    = NULL;
     mp_tailColors   = NULL;
+    
+    assert( vPlayerImg.size() == vPlayerNames.size() );
+    assert( vFoodImg.size() == vFoodSounds.size() );
+    assert( vPowerUps.size() > 0 );
 
-    cv::resize( headImg, m_headImg, cv::Size( m_tileSize, m_tileSize ) );
-    cv::resize( headImg, m_tailImg, cv::Size( m_tileSize - 10, m_tileSize - 10 ) );
+    for( int i = 0; i < vPlayerImg.size(); ++i )
+    {
+        cv::Mat currPlayerImg;
+        cv::resize( vPlayerImg[ i ], currPlayerImg, cv::Size( m_tileSize, m_tileSize ) );
+        m_vPlayerImg.push_back( currPlayerImg );
+        m_vPlayerNames.push_back( vPlayerNames[ i ] );
+    }
+    
+    //TODO wird ja aktuell nicht benutzt, allerdings muss die größe schon angepasst werden... 
+    cv::resize( m_vPlayerImg[ 0 ], m_tailImg, cv::Size( m_tileSize - 10, m_tileSize - 10 ) );
 
-    assert( vFoodItems.size() == vFoodSounds.size() );
-
-    for( int i = 0; i < vFoodItems.size(); ++i )
+    for( int i = 0; i < vFoodImg.size(); ++i )
     {
         cv::Mat currFoodImg;
-        cv::resize( vFoodItems[ i ], currFoodImg, cv::Size( m_tileSize, m_tileSize ) );
+        cv::resize( vFoodImg[ i ], currFoodImg, cv::Size( m_tileSize, m_tileSize ) );
         m_vFoodImg.push_back( currFoodImg );
         m_vFoodSounds.push_back( vFoodSounds[ i ] );
     }
+
+    m_vPowerUps = vPowerUps;
 
     m_gameImg = cv::Mat( tilesY * m_tileSize, tilesX * m_tileSize, CV_8UC3, BLACK );
     m_headPos = cv::Point2i( m_tilesX / 2, m_tilesY / 2 );
@@ -41,6 +53,90 @@ SnakeGame::~SnakeGame()
     if( mp_tailColors )
         delete[] mp_tailColors;
 }
+
+void SnakeGame::startMenu( const std::string startSound, const std::string wndName )
+{
+    m_gameWndName       = wndName;
+    int fontFace        = cv::FONT_HERSHEY_PLAIN;
+    int fontScale       = 4;
+    int fontThickness   = 3;
+
+    if( startSound != "" )
+    {
+        PlaySound( startSound.c_str(), NULL, SND_ASYNC );
+    }
+
+    m_gameImg.setTo( cv::Scalar( 0, 0, 0 ) );
+    cv::putText( m_gameImg, "S N A K E Z", cv::Point( m_gameImg.cols / 3, 100 ), fontFace, fontScale, GREEN, fontThickness );
+    
+    const int numPlayers    = (int)m_vPlayerImg.size();
+    const int spaceForImg   = m_gameImg.cols / numPlayers;
+
+    const int imgSizeToShow = ( int )( spaceForImg * 0.4 );
+    const int xStart        = ( spaceForImg - imgSizeToShow ) / 2;
+    const int yStart        = 200;
+    for( int i = 0; i < numPlayers; ++i )
+    {
+        cv::Mat currImg;
+        cv::resize( m_vPlayerImg[ i ], currImg, cv::Size( imgSizeToShow, imgSizeToShow ) );
+        currImg.copyTo( m_gameImg( cv::Rect( i * spaceForImg + xStart, yStart, currImg.cols, currImg.rows ) ) );
+    }
+
+    // selection bounding box
+    const cv::Rect startBB( cv::Point2i( xStart - 20, yStart - 20 ), cv::Point2i( xStart + imgSizeToShow + 20, yStart + imgSizeToShow + 20 ) );
+    int idx = 0;
+    while( true )
+    {
+        cv::Rect bb = startBB;
+        
+        bb.x += idx * spaceForImg;
+        cv::rectangle( m_gameImg, bb, WHITE, 3 );
+
+        cv::imshow( m_gameWndName, m_gameImg );
+        
+        int key = cv::waitKey( 0 );
+        if( 2424832 == key )        //  left
+        {
+            // clear old bb
+            cv::rectangle( m_gameImg, bb, BLACK, 3 );
+            idx--;
+            if( idx < 0 )
+                idx = numPlayers - 1;
+        }
+        else if( 2555904 == key )   //  right
+        {
+            // clear old bb
+            cv::rectangle( m_gameImg, bb, BLACK, 3 );
+            idx++;
+            if( idx >= numPlayers )
+                idx = 0;
+        }
+        else if( 13 == key )        // enter
+        {
+            m_currPlayerIdx = idx;
+            //TODO hard coded... evtl später auslagern, erstmal kein bock ^^
+            if( m_vPlayerNames[ idx ] == "JULIA" )
+            {
+                PlaySound( "D:\\Projects\\_sounds_\\julia.wav", NULL, SND_ASYNC );
+            }
+            else if( m_vPlayerNames[ idx ] == "MELINA" )
+            {
+                PlaySound( "D:\\Projects\\_sounds_\\melina.wav", NULL, SND_ASYNC );
+            }
+            else if( m_vPlayerNames[ idx ] == "MAMA" )
+            {
+                PlaySound( "D:\\Projects\\_sounds_\\simone.wav", NULL, SND_ASYNC );
+            }
+            else if( m_vPlayerNames[ idx ] == "PAPA" )
+            {
+                PlaySound( "D:\\Projects\\_sounds_\\lukas.wav", NULL, SND_ASYNC );
+            }
+            break;
+        }
+        
+    }
+}
+
 
 void SnakeGame::resetGame()
 {
@@ -70,6 +166,8 @@ void SnakeGame::resetGame()
     {
         mp_tailParts[ i ] = cv::Point2i( -1, -1 );
     }
+
+    //m_timeNextMove
 }
 
 void SnakeGame::update()
@@ -79,34 +177,40 @@ void SnakeGame::update()
         int key = cv::waitKey( 1 );
         if( key > 0 )
         {
-            if( key != 27 )
+            if( key == 13 )         // enter = new game
             {
                 resetGame();
                 m_bGameOver = false;
             }
-            else
+            else if( key == 27 )    // esc = end game
             {
                 m_bFinishGame = true;
+            }
+            else if( key == 's' )   // 's' = start menu
+            {
+                resetGame();
+                m_bGameOver = false;
+                startMenu();
             }
         }
         return;
     }
 
     // timer and position change
-    if( m_bPause == false )
+    if( m_bWaitForNextMove == false )
     {
-        m_startTime         = clock();
-        m_bPause            = true;
+        m_timerNextMove         = clock();
+        m_bWaitForNextMove  = true;
     }
     else
     {
         clock_t end         = clock();
-        float elapsedTime   = ( float )( end - m_startTime ) / CLOCKS_PER_SEC;
-        if( elapsedTime > TIME_FOR_MOVE_IN_SEC )
+        float elapsedTime   = ( float )( end - m_timerNextMove ) / CLOCKS_PER_SEC;
+        if( elapsedTime > m_timeMove )
         {
             updateTailParts();
 
-            m_bPause = false;
+            m_bWaitForNextMove = false;
 
             switch( m_movDir )
             {
@@ -214,6 +318,7 @@ void SnakeGame::update()
             if( m_headPos.x >= m_tilesX || m_headPos.x < 0 || m_headPos.y >= m_tilesY || m_headPos.y < 0 )
             {
                 m_bGameOver = true;
+                PlaySound( "D:\\Projects\\_sounds_\\gameover.wav", NULL, SND_ASYNC );
                 return;
             }
         }
@@ -224,6 +329,7 @@ void SnakeGame::update()
             if( m_headPos == mp_tailParts[ i ] )
             {
                 m_bGameOver = true;
+                PlaySound( "D:\\Projects\\_sounds_\\gameover.wav", NULL, SND_ASYNC );
                 return;
             }
         }
@@ -267,7 +373,6 @@ void SnakeGame::drawScene()
     }
 
     m_gameImg.setTo( cv::Scalar( 0, 0, 0 ) );
-    //m_headImg.copyTo( m_gameImg( cv::Rect( m_headPos.x - headRadius, m_headPos.y - headRadius, m_headImg.cols, m_headImg.rows ) ) );
 
     // draw tail
 #if CONNECT_TAIL_PARTS
@@ -302,7 +407,7 @@ void SnakeGame::drawScene()
     // draw head
     int x = m_headPos.x * m_tileSize;
     int y = m_headPos.y * m_tileSize;
-    drawIntoTile( x, y, m_headImg );
+    drawIntoTile( x, y, m_vPlayerImg[ m_currPlayerIdx ] );
 
     // draw food
     x = m_foodPos.x * m_tileSize;
@@ -316,6 +421,16 @@ void SnakeGame::drawScene()
     char pts[ 10 ];
     sprintf_s( pts, "%d", m_score );
     cv::putText( m_gameImg, pts, cv::Point( 10, 25 ), fontFace, fontScale, RED, fontThickness );
+
+    // draw border
+    if( m_bEasyMode )
+    {
+        cv::rectangle( m_gameImg, cv::Rect( 0, 0, m_gameImg.cols - 1, m_gameImg.rows - 1 ), GREEN, 3 );
+    }
+    else
+    {
+        cv::rectangle( m_gameImg, cv::Rect( 0, 0, m_gameImg.cols - 1, m_gameImg.rows - 1 ), RED, 3 );
+    }
 }
 
 void SnakeGame::drawIntoTile( const int x, const int y, const cv::Mat& img )
@@ -337,9 +452,12 @@ void SnakeGame::drawGameOver()
     int fontScale = 4;
     int fontThickness = 3;
 
-    cv::putText( m_gameImg, "GAME OVER", cv::Point( m_gameImg.cols / 4, m_gameImg.rows / 2 ), fontFace, fontScale, GREEN, fontThickness );
-    cv::putText( m_gameImg, "Close game -> ESC", cv::Point( m_gameImg.cols / 4, m_gameImg.rows / 2 + 40 ), fontFace, 1.5, RED, 2 );
-    cv::putText( m_gameImg, "New game   -> other key", cv::Point( m_gameImg.cols / 4, m_gameImg.rows / 2 + 70 ), fontFace, 1.5, RED, 2 );
+    const int x = m_gameImg.cols / 3;
+
+    cv::putText( m_gameImg, "GAME OVER", cv::Point( x, m_gameImg.rows / 2 ), fontFace, fontScale, GREEN, fontThickness );
+    cv::putText( m_gameImg, "Close game -> press ESC", cv::Point( x, m_gameImg.rows / 2 + 40 ), fontFace, 1.5, RED, 2 );
+    cv::putText( m_gameImg, "New game   -> press Enter", cv::Point( x, m_gameImg.rows / 2 + 70 ), fontFace, 1.5, RED, 2 );
+    cv::putText( m_gameImg, "Start menu -> press 's'", cv::Point( x, m_gameImg.rows / 2 + 100 ), fontFace, 1.5, RED, 2 );
 }
 
 void SnakeGame::keyHandling( const int keyCode )
@@ -371,5 +489,9 @@ void SnakeGame::keyHandling( const int keyCode )
     else if( 'e' == keyCode )
     {
         m_bEasyMode = !m_bEasyMode;
+    }
+    else if( 'p' == keyCode )       // pause game
+    {
+        cv::waitKey( 0 );
     }
 }

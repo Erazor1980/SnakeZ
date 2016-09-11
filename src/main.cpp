@@ -5,37 +5,47 @@
 
 int main()
 {
-	
-	
-    cv::Mat icecream = cv::imread( "D:/Projects/_images_/iceCream.png", 1 );
-    cv::Mat chicken = cv::imread( "D:/Projects/_images_/chicken.png", 1 );
-    cv::Mat snakeHead = cv::imread( "D:/Projects/_images_/julia.png", 1 );
-	//cv::Mat snakeHead = cv::imread( "D:/Projects/_images_/bvb.png", 1 );
-	//cv::Mat snakeHead = cv::imread( "D:/Projects/_images_/melina.png", 1 );
-	//cv::Mat snakeHead = cv::imread( "D:/Projects/_images_/luki.png", 1 );
-
+    // load food images and sounds
     std::vector< cv::Mat > vFoodImg;
-    vFoodImg.push_back( chicken );
-    vFoodImg.push_back( icecream );
+    vFoodImg.push_back( cv::imread( "D:/Projects/_images_/chicken.png", 1 ) );
+    vFoodImg.push_back( cv::imread( "D:/Projects/_images_/iceCream.png", 1 ) );
     std::vector< std::string > vFoodSounds;
-    vFoodSounds.push_back( "D:\\Projects\\_sounds_\\juliaKauen.wav" );
+    vFoodSounds.push_back( "D:\\Projects\\_sounds_\\papaKauen.wav" );
     vFoodSounds.push_back( "D:\\Projects\\_sounds_\\icecream.wav" );
 
-	if( snakeHead.empty() || vFoodImg[ 0 ].empty() )
-	{
-		printf( "No image data.\n" );
-		return -1;
-	}
+    // load player images
+    std::vector< cv::Mat > vPlayerImg;
+    vPlayerImg.push_back( cv::imread( "D:/Projects/_images_/julia.png", 1 ) );
+    vPlayerImg.push_back( cv::imread( "D:/Projects/_images_/melina.png", 1 ) );
+    vPlayerImg.push_back( cv::imread( "D:/Projects/_images_/mama.png", 1 ) );
+    vPlayerImg.push_back( cv::imread( "D:/Projects/_images_/papa.png", 1 ) );
 
-	cv::namedWindow( "Snake", cv::WINDOW_AUTOSIZE );
+    // add player names
+    std::vector< std::string > vPlayerNames;
+    vPlayerNames.push_back( "JULIA" );
+    vPlayerNames.push_back( "MELINA" );
+    vPlayerNames.push_back( "MAMA" );
+    vPlayerNames.push_back( "PAPA" );
 
-    SnakeGame myGame( 15, 10, snakeHead, vFoodImg, vFoodSounds, 100, true );
+    // add powerups
+    std::vector< powerUp > vPowerUps;
+    vPowerUps.push_back( powerUp( "rocket", cv::imread( "D:/Projects/_images_/rocket.png", 1 ), 10 ) );
+
+    //TODO evtl teste einbauen, ob alles richtig geladen wurde...
+
+	cv::namedWindow( "SnakeZ", cv::WINDOW_AUTOSIZE );
+    SnakeGame myGame( 15, 10, vPlayerImg, vPlayerNames, vFoodImg, vFoodSounds, vPowerUps, 100, true );
+
+    myGame.startMenu( "D:\\Projects\\_sounds_\\start.wav", "SnakeZ" );
 
     while( !myGame.finishGame() )
     {
         myGame.update();
-        cv::imshow( "Snake", myGame.getGameImg() );
+        //TODO getGamImg vielleicht durch displayGame oder so ersetzen! und innerhalb der klasse anzeigen!
+        cv::imshow( "SnakeZ", myGame.getGameImg() );
     }
     
+    cv::destroyAllWindows();
+
 	return 0;
 }
