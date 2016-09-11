@@ -131,6 +131,11 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
             if( speedLvl > 4 )
                 speedLvl = 1;
         }
+        else if( 27 == key )        // esc - finish game
+        {
+            m_bFinishGame = true;
+            return;
+        }
         else if( 13 == key )        // enter
         {
             m_currPlayerIdx = idx;
@@ -245,7 +250,6 @@ void SnakeGame::update()
         {
             if( !m_vPowerUps[ m_currPowerUp ].isAlive() )
             {
-                //m_currPowerUp = -1;
                 m_timerPU = clock();
                 m_timeTillNextPU = rand() % 10 + MIN_TIME_FOR_NEXT_PU;
             }
@@ -326,7 +330,7 @@ void SnakeGame::update()
             }
         }
         // power up check
-        if( m_vPowerUps[ m_currPowerUp ].isAlive()  )
+        if( m_vPowerUps[ m_currPowerUp ].isAlive() )
         {
             if( m_headPos == m_vPowerUps[ m_currPowerUp ].getPos() )
             {
@@ -404,9 +408,7 @@ void SnakeGame::update()
             }
         }
     }
-  
-   
-    
+     
     // key handling
     int keyCode = cv::waitKey( 1 );
     if( keyCode > 0 )

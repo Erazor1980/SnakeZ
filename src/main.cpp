@@ -29,7 +29,7 @@ int main()
 
     // add powerups
     std::vector< PowerUp > vPowerUps;
-    vPowerUps.push_back( PowerUp( "rocket", cv::imread( "D:/Projects/_images_/rocket.png", 1 ), 5, 10,
+    vPowerUps.push_back( PowerUp( "rocket", cv::imread( "D:/Projects/_images_/rocket.png", 1 ), 5, 7,
                                   "D:\\Projects\\_sounds_\\rocketShowUp.wav", "D:\\Projects\\_sounds_\\rocketConsume.wav" ) );
 
     //TODO evtl teste einbauen, ob alles richtig geladen wurde...
