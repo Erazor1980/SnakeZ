@@ -162,13 +162,13 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
         }       
     }
     m_lastTimeMove = m_timeMove;
-    startGame();
+    //startGame();
 }
 
-void SnakeGame::startGame()
-{
-    m_timerPU = clock();
-}
+//void SnakeGame::startGame()
+//{
+//    //m_timerPU = clock();
+//}
 
 void SnakeGame::resetGame()
 {
@@ -200,10 +200,15 @@ void SnakeGame::resetGame()
         mp_tailParts[ i ] = cv::Point2i( -1, -1 );
     }
 
-    m_timeTillNextPU    = rand() % 10 + MIN_TIME_FOR_NEXT_PU;
     m_timeMove          = m_lastTimeMove;
+
+    for( int i = 0; i < m_vPowerUps.size(); ++i )
+    {
+        m_vPowerUps[ i ].init( this, MIN_TIME_FOR_NEXT_PU, MAX_TIME_FOR_NEXT_PU );
+    }
+    /*m_timeTillNextPU    = rand() % 10 + MIN_TIME_FOR_NEXT_PU;
     m_vPowerUps[ m_currPowerUp ].resetPowerUp();
-    m_bPUvisibleOrActive = false;
+    m_bPUvisibleOrActive = false;*/
 }
 
 void SnakeGame::update()
@@ -216,7 +221,7 @@ void SnakeGame::update()
             if( key == 13 )         // enter = new game
             {
                 resetGame();
-                startGame();
+                //startGame();
                 m_bGameOver = false;
             }
             else if( key == 27 )    // esc = end game
@@ -234,30 +239,8 @@ void SnakeGame::update()
     }
 
     // power ups
-    {
-        if( !m_bPUvisibleOrActive )     /* no visible power up or active boost */
-        {
-            clock_t end         = clock();
-            float elapsedTime   = ( float )( end - m_timerPU ) / CLOCKS_PER_SEC;
-            if( elapsedTime > m_timeTillNextPU )
-            {
-                m_currPowerUp = rand() % m_vPowerUps.size();
-                m_vPowerUps[ m_currPowerUp ].activate( this );
-                m_bPUvisibleOrActive = true;
-            }
-        }
-        else
-        {
-            if( !m_vPowerUps[ m_currPowerUp ].isAlive() )
-            {
-                m_timerPU = clock();
-                m_timeTillNextPU = rand() % 10 + MIN_TIME_FOR_NEXT_PU;
-            }
-
-            m_vPowerUps[ m_currPowerUp ].boostEndTest( this );
-        }
-
-    }
+    //TODO m_currPowerUp ist immer 0 bis jetzt, muss noch irgendwo geändert werden! oder halt mehrere erlauben, die selbst ihre zeiten regeln!
+    m_vPowerUps[ m_currPowerUp ].update();
 
     // timer and position change
     if( m_bWaitForNextMove == false )
@@ -328,18 +311,7 @@ void SnakeGame::update()
             default:
                 break;
             }
-        }
-        // power up check
-        if( m_vPowerUps[ m_currPowerUp ].isAlive() )
-        {
-            if( m_headPos == m_vPowerUps[ m_currPowerUp ].getPos() )
-            {
-                m_timerPU = clock();
-                m_timeTillNextPU = rand() % 10 + MIN_TIME_FOR_NEXT_PU;
-
-                m_vPowerUps[ m_currPowerUp ].enableBoost( this );
-            }
-        }        
+        }   
 
         // food check
         if( m_headPos == m_foodPos )
@@ -370,7 +342,7 @@ void SnakeGame::update()
 
             mp_tailColors[ m_numTailParts ] = cv::Scalar( rand() % 255, rand() % 255, rand() % 255 );
             m_numTailParts++;
-            m_score++;
+            m_score += m_addedScoreNumber;
             
             m_currFoodIdx = rand() % m_vFoodImg.size();
         }
@@ -480,11 +452,7 @@ void SnakeGame::drawScene()
     int x = m_headPos.x * m_tileSize;
     int y = m_headPos.y * m_tileSize;
     drawIntoTile( x, y, m_vPlayerImg[ m_currPlayerIdx ] );
-    if( m_vPowerUps[ m_currPowerUp ].boostOn() )    // red rectangle around the head if boost is active
-    {
-        cv::rectangle( m_gameImg, cv::Rect( x, y, m_vPlayerImg[ m_currPlayerIdx ].cols - 1, m_vPlayerImg[ m_currPlayerIdx ].rows - 1 ), RED, 3 );
-    }
-
+    
     // draw food
     x = m_foodPos.x * m_tileSize;
     y = m_foodPos.y * m_tileSize;
@@ -498,13 +466,7 @@ void SnakeGame::drawScene()
     sprintf_s( pts, "%d", m_score );
     cv::putText( m_gameImg, pts, cv::Point( 10, 25 ), fontFace, fontScale, RED, fontThickness );
 
-    // draw power up
-    if( m_vPowerUps[ m_currPowerUp ].isAlive() )
-    {
-        x = m_vPowerUps[ m_currPowerUp ].getPos().x * m_tileSize;
-        y = m_vPowerUps[ m_currPowerUp ].getPos().y * m_tileSize;
-        drawIntoTile( x, y, m_vPowerUps[ m_currPowerUp ].getImg() );
-    }
+    m_vPowerUps[ m_currPowerUp ].draw();
 
     // draw border
     if( m_bEasyMode )

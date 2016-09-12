@@ -3,6 +3,13 @@
 
 class SnakeGame;
 
+enum ePU_State
+{
+    _WAIT = 0,
+    _VISIBLE = 1,
+    _BOOST = 2
+};
+
 class PowerUp
 {
 public:
@@ -10,45 +17,35 @@ public:
              const std::string showUpSound, const std::string consumeSound );
     ~PowerUp() {};
 
-    // PU is activated and will appear on a random free position on the screen
-    void activate( const SnakeGame* pGame );
-
-    // is the PU still living (on the screen)?
-    bool isAlive();
-
-    // the PU boost is enabled, PU dissapears from the screen
-    void enableBoost( SnakeGame* pGame );
-
-    // check, if boost ends, if yes, disable its effect
-    void boostEndTest( SnakeGame* pGame );
-
-    bool boostOn() const
-    {
-        return m_bBoostOn;
-    }
-
-    void resetPowerUp();
-
-    cv::Point2i getPos() const
-    {
-        return m_pos;
-    }
-    cv::Mat getImg() const
-    {
-        return m_img;
-    }
+    // new PowerUp between minTime and maxTime
+    void init( SnakeGame* pSnakeGame, int minTime = 5, int maxTime = 5 );
+    void update();
+    void draw();
 private:
+    void calcNewTime();
+
+    //TODO für die vererbung! nur diese beiden methoden muss geändert werden!
+    void enableBoostEffect();
+    void disableBoostEffect();
+
     cv::String  m_name;
     cv::Mat     m_img;
     cv::Point2i m_pos;          /* position of the power up in tiles (x, y) */
     int         m_boostTime;    /* how long will the effect of the power up last in seconds */
-
-    bool        m_bVisible;     /* PU on the screen, but not "eaten" */
-    bool        m_bBoostOn;     /* boost activated */
-
     int         m_lifeTime;     /* how long will the power up remain in seconds */
+    int         m_newTime;      /* how long after end of boost/end of life till new life in seconds */
+
+    int         m_minTime;      /* to calculate a random m_newTime (between minTime and maxTime) */
+    int         m_maxTime;      /* to calculate a random m_newTime (between minTime and maxTime) */
+
     clock_t     m_timerLife;    /* for tracking its own "living time" */
-    clock_t     m_timerBoost;
+    clock_t     m_timerBoost;   /* for tracking the boost time */
+    clock_t     m_timerNew;     /* for tracking the time after end of boost/end of life till new life */
+
+    ePU_State   m_state;        /* in which state is the PU: waiting (for new life), visible or boost */
+
     std::string m_showUpSound;
     std::string m_consumeSound;
+
+    SnakeGame*  mp_snakeGame;
 };

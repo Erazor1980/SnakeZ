@@ -6,10 +6,13 @@
 //      - pause einbauen
 //      - random powerups... + für schneller (ne gewisse zeit), da kriegt man mehr punkte z.b.
 //      - schwierigkeit auswählen, evtl automatisch bei julia setzen!
+//      - anzeige von punkten UND schwanzlänge (die extra tracken)
+//      - anzeige restzeit vom boost
 
 
 #define CONNECT_TAIL_PARTS      (1)
-#define MIN_TIME_FOR_NEXT_PU    (1)    /* minimum time in seconds for next PU */
+#define MIN_TIME_FOR_NEXT_PU    (4)    /* minimum time in seconds for next PU */
+#define MAX_TIME_FOR_NEXT_PU    (4)    /* minimum time in seconds for next PU */
 
 enum eMovDirection
 {
@@ -39,7 +42,7 @@ public:
 
     friend PowerUp;
 private:
-    void startGame();
+    //void startGame();
     void resetGame();
     void updateTailParts();
     void drawScene();
@@ -49,6 +52,7 @@ private:
     int m_tilesY            = 20;
     int m_tileSize;
     int m_score             = 0;
+    int m_addedScoreNumber  = 1;
     eMovDirection m_movDir  = RIGHT;
     eMovDirection m_lastDir = RIGHT;
     bool m_bEasyMode        = true;
@@ -81,10 +85,4 @@ private:
     double m_timeMove       = 0.1;      /* time till next move in seconds (current) -> i.a. for boosts */
     double m_lastTimeMove   = 0.1;      /* time till next move in seconds (selected in menu) -> for reset */
     clock_t m_timerNextMove;            /* for tracking time between moves */
-
-    // power ups
-    bool m_bPUvisibleOrActive = false;
-    clock_t m_timerPU;                  /* for tracking till next power up */
-    //clock_t m_boostTimer;               /* for tracking of the boost time */
-    double m_timeTillNextPU = 15;       /* time till next power up in seconds */
 };
