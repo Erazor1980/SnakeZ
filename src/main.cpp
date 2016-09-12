@@ -28,8 +28,8 @@ int main()
     vPlayerNames.push_back( "PAPA" );
 
     // add powerups
-    int lifeTime = 3;
-    int boostTime = 5;
+    int lifeTime = 5;
+    int boostTime = 8;
     std::vector< PowerUp > vPowerUps;
     vPowerUps.push_back( PowerUp( "rocket", cv::imread( "D:/Projects/_images_/rocket.png", 1 ), lifeTime, boostTime,
                                   "D:\\Projects\\_sounds_\\rocketShowUp.wav", "D:\\Projects\\_sounds_\\rocketConsume.wav" ) );

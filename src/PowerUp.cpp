@@ -19,10 +19,7 @@ void PowerUp::init( SnakeGame * pSnakeGame, int minTime, int maxTime )
     m_minTime       = minTime;
     m_maxTime       = maxTime;
 
-    m_timerNew      = -1;
-    m_timerLife     = -1;
-    m_timerBoost    = -1;
-
+    m_timer         = -1;
     m_state         = _WAIT;
 
     calcNewTime();
@@ -33,47 +30,43 @@ void PowerUp::update()
 {
     assert( mp_snakeGame != NULL );
 
-    //TODO evtl einen timer für alle benutzen! sollte gehen! erstmal aber so testen
     if( _WAIT == m_state )
     {
-        if( m_timerNew < 0 )
+        if( m_timer < 0 )
         {
             // countdown till new PU life starts
-            m_timerNew = clock();
+            m_timer = clock();
             calcNewTime();
         }
         else
         {
             clock_t end         = clock();
-            float elapsedTime   = ( float )( end - m_timerNew ) / CLOCKS_PER_SEC;
+            float elapsedTime   = ( float )( end - m_timer ) / CLOCKS_PER_SEC;
             if( elapsedTime > m_newTime )
             {
                 // create new PU
-                //TODO add free tile detection and coordinate assignment
-                m_pos.x  = rand() % mp_snakeGame->m_tilesX;
-                m_pos.y  = rand() % mp_snakeGame->m_tilesY;
+                m_pos = mp_snakeGame->findFreeTile( true );
                 PlaySound( m_showUpSound.c_str(), NULL, SND_ASYNC );
 
-                m_timerLife = -1;
+                m_timer = -1;
                 m_state = _VISIBLE;
             }
         }
     }
     else if( _VISIBLE == m_state )
     {
-        if( m_timerLife < 0 )
+        if( m_timer < 0 )
         {
-            m_timerLife = clock();
+            m_timer = clock();
         }
         else
         {
             clock_t end         = clock();
-            float elapsedTime   = ( float )( end - m_timerLife ) / CLOCKS_PER_SEC;
+            float elapsedTime   = ( float )( end - m_timer ) / CLOCKS_PER_SEC;
             if( elapsedTime > m_lifeTime )
             {
                 // PU life time expired (without beeing consumed)
-                m_timerNew  = -1;
-                m_timerLife = -1;
+                m_timer  = -1;
                 m_state = _WAIT;
             }
             else
@@ -82,7 +75,7 @@ void PowerUp::update()
                 if( mp_snakeGame->m_headPos == m_pos )
                 {
                     // PU consumed!
-                    m_timerBoost = -1;
+                    m_timer = -1;
                     m_state = _BOOST;
                     PlaySound( m_consumeSound.c_str(), NULL, SND_ASYNC );
                     enableBoostEffect();
@@ -92,17 +85,17 @@ void PowerUp::update()
     }
     else if( _BOOST == m_state )
     {
-        if( m_timerBoost < 0 )
+        if( m_timer < 0 )
         {
-            m_timerBoost = clock();
+            m_timer = clock();
         }
         else
         {
             clock_t end         = clock();
-            float elapsedTime   = ( float )( end - m_timerBoost ) / CLOCKS_PER_SEC;
+            float elapsedTime   = ( float )( end - m_timer ) / CLOCKS_PER_SEC;
             if( elapsedTime > m_boostTime )
             {
-                m_timerNew = -1;
+                m_timer = -1;
                 m_state = _WAIT;
                 disableBoostEffect();
             }
@@ -117,8 +110,10 @@ void PowerUp::draw()
     double fontScale = 1.5;
     int fontThickness = 2;
     char infosPU[ 255 ];
-    sprintf_s( infosPU, "PowerUp status: %d, newTime: %d", (int)m_state, m_newTime );
-    cv::putText( mp_snakeGame->m_gameImg, infosPU, cv::Point( 300, 25 ), fontFace, fontScale, RED, fontThickness );
+    clock_t end         = clock();
+    float elapsedTime   = ( float )( end - m_timer ) / CLOCKS_PER_SEC;
+    sprintf_s( infosPU, "PowerUp status: %d, timer: %0.2f", (int)m_state, elapsedTime );
+    cv::putText( mp_snakeGame->m_gameImg, infosPU, cv::Point( 300, 25 ), fontFace, fontScale, CYAN, fontThickness );
 #endif
     if( m_state == _BOOST )
     {

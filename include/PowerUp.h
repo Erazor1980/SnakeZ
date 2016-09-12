@@ -21,6 +21,11 @@ public:
     void init( SnakeGame* pSnakeGame, int minTime = 5, int maxTime = 5 );
     void update();
     void draw();
+
+    cv::Point2i getPos() const
+    {
+        return m_pos;
+    }
 private:
     void calcNewTime();
 
@@ -38,9 +43,7 @@ private:
     int         m_minTime;      /* to calculate a random m_newTime (between minTime and maxTime) */
     int         m_maxTime;      /* to calculate a random m_newTime (between minTime and maxTime) */
 
-    clock_t     m_timerLife;    /* for tracking its own "living time" */
-    clock_t     m_timerBoost;   /* for tracking the boost time */
-    clock_t     m_timerNew;     /* for tracking the time after end of boost/end of life till new life */
+    clock_t     m_timer;        /* for tracking time for each state */
 
     ePU_State   m_state;        /* in which state is the PU: waiting (for new life), visible or boost */
 

@@ -319,28 +319,10 @@ void SnakeGame::update()
             PlaySound( m_vFoodSounds[ m_currFoodIdx ].c_str(), NULL, SND_ASYNC );
 
             // find a free tile for the new food placement
-            while( true )
-            {
-                m_foodPos.x = rand() % m_tilesX;
-                m_foodPos.y = rand() % m_tilesY;
-                bool occupiedTile = false;
-                if( m_foodPos == m_headPos )
-                {
-                    continue;
-                }
-                for( int i = 0; i < m_numTailParts; ++i )
-                {
-                    if( m_foodPos == mp_tailParts[ i ] )
-                    {
-                        occupiedTile = true;
-                        break;
-                    }                        
-                }
-                if( !occupiedTile )
-                    break;
-            }
+            m_foodPos = findFreeTile( false );
 
-            mp_tailColors[ m_numTailParts ] = cv::Scalar( rand() % 255, rand() % 255, rand() % 255 );
+            //mp_tailColors[ m_numTailParts ] = cv::Scalar( rand() % 255, rand() % 255, rand() % 255 );
+            mp_tailColors[ m_numTailParts ] = cv::Scalar( 200, 200, 200 );
             m_numTailParts++;
             m_score += m_addedScoreNumber;
             
@@ -415,7 +397,6 @@ void SnakeGame::drawScene()
         drawGameOver();
         return;
     }
-
     m_gameImg.setTo( cv::Scalar( 0, 0, 0 ) );
 
     // draw tail
@@ -504,6 +485,52 @@ void SnakeGame::drawGameOver()
     cv::putText( m_gameImg, "Close game -> press ESC", cv::Point( x, m_gameImg.rows / 2 + 40 ), fontFace, 1.5, RED, 2 );
     cv::putText( m_gameImg, "New game   -> press Enter", cv::Point( x, m_gameImg.rows / 2 + 70 ), fontFace, 1.5, RED, 2 );
     cv::putText( m_gameImg, "Start menu -> press 's'", cv::Point( x, m_gameImg.rows / 2 + 100 ), fontFace, 1.5, RED, 2 );
+}
+
+cv::Point2i SnakeGame::findFreeTile( bool isPU )
+{
+    cv::Point2i freeTile;
+    while( true )
+    {
+        freeTile.x = rand() % m_tilesX;
+        freeTile.y = rand() % m_tilesY;
+        bool occupiedTile = false;
+        // compare to head position
+        if( freeTile == m_headPos )
+        {
+            continue;
+        }
+
+        // compare to food position (we are power up)
+        if( isPU )
+        {
+            if( freeTile == m_foodPos )
+            {
+                continue;
+            }
+        }
+        // compare to power up position (we are food)
+        else
+        {
+            if( freeTile == m_vPowerUps[ m_currPowerUp ].getPos() )
+            {
+                continue;
+            }
+        }
+        
+        for( int i = 0; i < m_numTailParts; ++i )
+        {
+            if( freeTile == mp_tailParts[ i ] )
+            {
+                occupiedTile = true;
+                break;
+            }
+        }
+        if( !occupiedTile )
+            break;
+    }   
+
+    return freeTile;
 }
 
 void SnakeGame::keyHandling( const int keyCode )

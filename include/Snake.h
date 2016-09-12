@@ -3,16 +3,15 @@
 #include "PowerUp.h"
 
 //TODO  - highscore speichern
-//      - pause einbauen
-//      - random powerups... + für schneller (ne gewisse zeit), da kriegt man mehr punkte z.b.
-//      - schwierigkeit auswählen, evtl automatisch bei julia setzen!
 //      - anzeige von punkten UND schwanzlänge (die extra tracken)
 //      - anzeige restzeit vom boost
+//      - in den schwanz laufen evtl besser (oder überhaupt) darstellen
+
 
 
 #define CONNECT_TAIL_PARTS      (1)
 #define MIN_TIME_FOR_NEXT_PU    (4)    /* minimum time in seconds for next PU */
-#define MAX_TIME_FOR_NEXT_PU    (4)    /* minimum time in seconds for next PU */
+#define MAX_TIME_FOR_NEXT_PU    (8)    /* maximum time in seconds for next PU */
 
 enum eMovDirection
 {
@@ -42,12 +41,14 @@ public:
 
     friend PowerUp;
 private:
-    //void startGame();
     void resetGame();
     void updateTailParts();
     void drawScene();
     void drawIntoTile( const int x, const int y, const cv::Mat& img );
     void drawGameOver();
+
+    cv::Point2i findFreeTile( bool isPU = false );         /* considering head, all tail parts and food/PU etc */
+
     int m_tilesX            = 30;
     int m_tilesY            = 20;
     int m_tileSize;
