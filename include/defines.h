@@ -11,4 +11,4 @@
 #define BLACK	cv::Scalar( 0, 0, 0 )
 #define CYAN    cv::Scalar( 255, 255, 0 )
 
-#define DEBUG_INFOS (1)
+#define DEBUG_INFOS (0)

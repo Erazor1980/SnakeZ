@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include "Snake.h"
 
-//void updateMap( cv::Mat& img, const Ball& ball );
-
 int main()
 {
     // load food images and sounds
@@ -28,8 +26,8 @@ int main()
     vPlayerNames.push_back( "PAPA" );
 
     // add powerups
-    int lifeTime = 5;
-    int boostTime = 8;
+    int lifeTime = 10;
+    int boostTime = 15;
     std::vector< PowerUp > vPowerUps;
     vPowerUps.push_back( PowerUp( "rocket", cv::imread( "D:/Projects/_images_/rocket.png", 1 ), lifeTime, boostTime,
                                   "D:\\Projects\\_sounds_\\rocketShowUp.wav", "D:\\Projects\\_sounds_\\rocketConsume.wav" ) );

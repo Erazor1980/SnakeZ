@@ -62,7 +62,7 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
 
     if( startSound != "" )
     {
-        //PlaySound( startSound.c_str(), NULL, SND_ASYNC );
+        PlaySound( startSound.c_str(), NULL, SND_ASYNC );
     }
     
     const int numPlayers    = (int)m_vPlayerImg.size();
@@ -72,7 +72,7 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
     const int yStart        = 200;
     
     char lvlText[ 100 ];
-    int speedLvl = 4;
+    int speedLvl = 1;
 
     // selection bounding box and speed level
     const cv::Rect startBB( cv::Point2i( xStart - 20, yStart - 20 ), cv::Point2i( xStart + imgSizeToShow + 20, yStart + imgSizeToShow + 20 ) );
@@ -206,9 +206,6 @@ void SnakeGame::resetGame()
     {
         m_vPowerUps[ i ].init( this, MIN_TIME_FOR_NEXT_PU, MAX_TIME_FOR_NEXT_PU );
     }
-    /*m_timeTillNextPU    = rand() % 10 + MIN_TIME_FOR_NEXT_PU;
-    m_vPowerUps[ m_currPowerUp ].resetPowerUp();
-    m_bPUvisibleOrActive = false;*/
 }
 
 void SnakeGame::update()
@@ -221,7 +218,6 @@ void SnakeGame::update()
             if( key == 13 )         // enter = new game
             {
                 resetGame();
-                //startGame();
                 m_bGameOver = false;
             }
             else if( key == 27 )    // esc = end game
@@ -321,8 +317,8 @@ void SnakeGame::update()
             // find a free tile for the new food placement
             m_foodPos = findFreeTile( false );
 
-            //mp_tailColors[ m_numTailParts ] = cv::Scalar( rand() % 255, rand() % 255, rand() % 255 );
-            mp_tailColors[ m_numTailParts ] = cv::Scalar( 200, 200, 200 );
+            mp_tailColors[ m_numTailParts ] = cv::Scalar( rand() % 255, rand() % 255, rand() % 255 );
+            //mp_tailColors[ m_numTailParts ] = cv::Scalar( 200, 200, 200 );
             m_numTailParts++;
             m_score += m_addedScoreNumber;
             
