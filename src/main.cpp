@@ -7,9 +7,11 @@ int main()
     std::vector< cv::Mat > vFoodImg;
     vFoodImg.push_back( cv::imread( "D:/Projects/_images_/chicken.png", 1 ) );
     vFoodImg.push_back( cv::imread( "D:/Projects/_images_/iceCream.png", 1 ) );
+    vFoodImg.push_back( cv::imread( "D:/Projects/_images_/soap.png", 1 ) );
     std::vector< std::string > vFoodSounds;
     vFoodSounds.push_back( "D:\\Projects\\_sounds_\\papaKauen.wav" );
     vFoodSounds.push_back( "D:\\Projects\\_sounds_\\icecream.wav" );
+    vFoodSounds.push_back( "D:\\Projects\\_sounds_\\blow.wav" );
 
     // load player images
     std::vector< cv::Mat > vPlayerImg;
