@@ -44,18 +44,7 @@ SnakeGame::SnakeGame( const int tilesX, const int tilesY, const std::vector< cv:
 
     resetGame();
 
-    /*m_overallScoreBoard.addScore( "luki", 1 );
-    m_overallScoreBoard.addScore( "luki", 2 );
-    m_overallScoreBoard.addScore( "luki", 3 );
-    m_overallScoreBoard.addScore( "luki", 4 );
-    m_overallScoreBoard.addScore( "simi", 5 );
-    m_overallScoreBoard.addScore( "simi", 15 );
-    m_overallScoreBoard.addScore( "simi", 6 );
-    m_overallScoreBoard.addScore( "simi", 7 );
-    m_overallScoreBoard.addScore( "simi", 8 );
-    m_overallScoreBoard.addScore( "simi", 9 );
-    m_overallScoreBoard.addScore( "simi", 10 );
-    m_overallScoreBoard.addScore( "simi", 1 );*/
+    m_overallScoreBoard.loadFromFile();
 }
 
 SnakeGame::~SnakeGame()
@@ -64,6 +53,9 @@ SnakeGame::~SnakeGame()
         delete[] mp_tailParts;
     if( mp_tailColors )
         delete[] mp_tailColors;
+
+    if( m_overallScoreBoard.isNotEmpty() )
+        m_overallScoreBoard.writeToFile();
 }
 
 void SnakeGame::startMenu( const std::string startSound, const std::string wndName )
@@ -75,7 +67,7 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
 
     if( startSound != "" )
     {
-        //PlaySound( startSound.c_str(), NULL, SND_ASYNC );
+        PlaySound( startSound.c_str(), NULL, SND_ASYNC );
     }
     
     const int numPlayers    = (int)m_vPlayerImg.size();
@@ -358,7 +350,10 @@ void SnakeGame::update()
             {
                 m_bGameOver = true;
                 PlaySound( "D:\\Projects\\_sounds_\\gameover.wav", NULL, SND_ASYNC );
-                m_overallScoreBoard.addScore( m_vPlayerNames[ m_currPlayerIdx ], m_score );
+                if( m_overallScoreBoard.addScore( m_vPlayerNames[ m_currPlayerIdx ], m_score ) )
+                {
+                    PlaySound( "D:\\Projects\\_sounds_\\highScore.wav", NULL, SND_ASYNC );
+                }
                 return;
             }
         }
@@ -370,7 +365,10 @@ void SnakeGame::update()
             {
                 m_bGameOver = true;
                 PlaySound( "D:\\Projects\\_sounds_\\gameover.wav", NULL, SND_ASYNC );
-                m_overallScoreBoard.addScore( m_vPlayerNames[ m_currPlayerIdx ], m_score );
+                if( m_overallScoreBoard.addScore( m_vPlayerNames[ m_currPlayerIdx ], m_score ) )
+                {
+                    PlaySound( "D:\\Projects\\_sounds_\\highScore.wav", NULL, SND_ASYNC );
+                }
                 return;
             }
         }
@@ -537,7 +535,11 @@ void SnakeGame::displayHighScore( const ScoreBoard& sb )
 
         int key = cv::waitKey( 0 );
 
-        if( 27 == key )        // esc - back to main menu
+        if( 2424832 == key )        //  left
+        {
+            //TODO add personal highscores, and display them
+        }
+        else
         {
             return;
         }

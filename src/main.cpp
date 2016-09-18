@@ -1,27 +1,8 @@
 #include <stdio.h>
 #include "Snake.h"
 
-#include "ScoreBoard.h"
 int main()
 {
-    /*ScoreBoard mySB;
-    mySB.addScore( "luki", 1 );
-    mySB.addScore( "luki", 2 );
-    mySB.addScore( "luki", 3 );
-    mySB.addScore( "luki", 4 );
-    mySB.addScore( "simi", 5 );
-    mySB.addScore( "simi", 15 );
-    mySB.addScore( "simi", 6 );
-    mySB.addScore( "simi", 7 );
-    mySB.addScore( "simi", 8 );
-    mySB.addScore( "simi", 9 );
-    mySB.addScore( "simi", 10 );
-    mySB.addScore( "simi", 1 );
-
-    mySB.testPrint();
-
-    std::vector<Node> vNodes = mySB.getScoreBoardList();
-    return 0;*/
     // load food images and sounds
     std::vector< cv::Mat > vFoodImg;
     vFoodImg.push_back( cv::imread( "D:/Projects/_images_/chicken.png", 1 ) );

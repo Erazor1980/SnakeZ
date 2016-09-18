@@ -30,6 +30,16 @@ public:
     ScoreBoard();
     ~ScoreBoard();
 
+    void writeToFile( const std::string fileName = "highscore.txt" );
+    void loadFromFile( const std::string fileName = "highscore.txt" );
+    bool isNotEmpty()
+    {
+        if( mp_firstNode == NULL )
+            return false;
+        else
+            return true;
+    }
+
     void testPrint()
     {
         Node* currNode = mp_firstNode;
@@ -44,12 +54,12 @@ public:
     }
 
     std::vector< Node > getScoreBoardList() const;
-
-    void loadScoreBoard();
-    void saveScoreBoard();
-
-    void addScore( const std::string name, const int points );
+    
+    // new high score -> returns true
+    bool addScore( const std::string name, const int points );
 
 private:
+    void reset();
+
     Node* mp_firstNode = NULL;
 };

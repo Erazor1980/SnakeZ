@@ -1,4 +1,5 @@
 #include "ScoreBoard.h"
+#include <fstream>
 
 ScoreBoard::ScoreBoard()
 {
@@ -6,14 +7,62 @@ ScoreBoard::ScoreBoard()
 
 ScoreBoard::~ScoreBoard()
 {
+    reset();
+}
+
+void ScoreBoard::reset()
+{
     Node* current = mp_firstNode;
     while( current != NULL )
     {
         Node* next = current->mp_nextNode;
         delete current;
+        current = NULL;
         current = next;
     }
     mp_firstNode = NULL;
+}
+
+void ScoreBoard::writeToFile( const std::string fileName )
+{
+    std::ofstream out( fileName.c_str() );
+    
+    if( mp_firstNode )
+    {
+        out << mp_firstNode->m_name << std::endl;
+        out << mp_firstNode->m_points;
+    }
+    if( mp_firstNode->mp_nextNode )
+    {
+        Node* currNode = mp_firstNode->mp_nextNode;
+        while( currNode )
+        {
+            out << std::endl << currNode->m_name << std::endl;
+            out << currNode->m_points;
+            currNode = currNode->mp_nextNode;
+        }
+    }    
+    out.close();
+}
+
+void ScoreBoard::loadFromFile( const std::string fileName )
+{
+    reset();
+    std::string name;
+    int points;
+    std::ifstream in( fileName.c_str() );
+    if( !in.is_open() )
+    {
+        printf( "Could not open %s.\n", fileName.c_str() );
+        return;
+    }
+    while( !in.eof() )
+    {
+        in >> name;
+        in >> points;
+        addScore( name, points );
+    }
+    in.close();
 }
 
 std::vector<Node> ScoreBoard::getScoreBoardList() const
@@ -28,15 +77,7 @@ std::vector<Node> ScoreBoard::getScoreBoardList() const
     return vNodes;
 }
 
-void ScoreBoard::loadScoreBoard()
-{
-}
-
-void ScoreBoard::saveScoreBoard()
-{
-}
-
-void ScoreBoard::addScore( const std::string name, const int points )
+bool ScoreBoard::addScore( const std::string name, const int points )
 {
     if( mp_firstNode == NULL )
     {
@@ -50,7 +91,7 @@ void ScoreBoard::addScore( const std::string name, const int points )
             Node* next = mp_firstNode;
             mp_firstNode = new Node( name, points );
             mp_firstNode->setNext( next );
-            return;
+            return true;
         }
 
         // at least one entry in the list
@@ -105,4 +146,7 @@ void ScoreBoard::addScore( const std::string name, const int points )
             }
         }
     }
+    return false;
 }
+
+
