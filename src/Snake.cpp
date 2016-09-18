@@ -77,7 +77,7 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
     const int yStart        = 200;
     
     char lvlText[ 100 ];
-    int speedLvl = 1;
+    int speedLvl = 4;
 
     // selection bounding box and speed level
     const cv::Rect startBB( cv::Point2i( xStart - 20, yStart - 20 ), cv::Point2i( xStart + imgSizeToShow + 20, yStart + imgSizeToShow + 20 ) );

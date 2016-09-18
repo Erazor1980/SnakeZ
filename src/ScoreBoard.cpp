@@ -23,47 +23,94 @@ void ScoreBoard::reset()
     mp_firstNode = NULL;
 }
 
+struct nameAndScore
+{
+    char name[ 50 ];
+    int score;
+};
+
 void ScoreBoard::writeToFile( const std::string fileName )
 {
-    std::ofstream out( fileName.c_str() );
-    
-    if( mp_firstNode )
+    std::ofstream out( fileName.c_str(), std::ios::binary );
+
+    Node* currNode = mp_firstNode;
+    while( currNode )
     {
-        out << mp_firstNode->m_name << std::endl;
-        out << mp_firstNode->m_points;
+        nameAndScore nas;
+        sprintf_s( nas.name, "%s", currNode->m_name.c_str() );
+        nas.score = currNode->m_points;
+
+        out.write( ( char* )&nas, sizeof( nameAndScore ) );
+        currNode = currNode->mp_nextNode;
     }
-    if( mp_firstNode->mp_nextNode )
-    {
-        Node* currNode = mp_firstNode->mp_nextNode;
-        while( currNode )
-        {
-            out << std::endl << currNode->m_name << std::endl;
-            out << currNode->m_points;
-            currNode = currNode->mp_nextNode;
-        }
-    }    
     out.close();
 }
 
 void ScoreBoard::loadFromFile( const std::string fileName )
 {
     reset();
-    std::string name;
-    int points;
-    std::ifstream in( fileName.c_str() );
+
+    std::ifstream in( fileName.c_str(), std::ios::binary );
     if( !in.is_open() )
     {
         printf( "Could not open %s.\n", fileName.c_str() );
         return;
     }
+
     while( !in.eof() )
     {
-        in >> name;
-        in >> points;
-        addScore( name, points );
+        nameAndScore nas;
+        in.read( ( char* )&nas, sizeof( nameAndScore ) );
+
+        // check if the size of read data equals the desired size
+        if( (int)in.gcount() == sizeof( nameAndScore ) )
+            addScore( nas.name, nas.score );
     }
     in.close();
 }
+
+// OLD VERSIONS
+//void ScoreBoard::writeToFile( const std::string fileName )
+//{
+//    std::ofstream out( fileName.c_str() );
+//    
+//    if( mp_firstNode )
+//    {
+//        out << mp_firstNode->m_name << std::endl;
+//        out << mp_firstNode->m_points;
+//    }
+//    if( mp_firstNode->mp_nextNode )
+//    {
+//        Node* currNode = mp_firstNode->mp_nextNode;
+//        while( currNode )
+//        {
+//            out << std::endl << currNode->m_name << std::endl;
+//            out << currNode->m_points;
+//            currNode = currNode->mp_nextNode;
+//        }
+//    }    
+//    out.close();
+//}
+//
+//void ScoreBoard::loadFromFile( const std::string fileName )
+//{
+//    reset();
+//    std::string name;
+//    int points;
+//    std::ifstream in( fileName.c_str() );
+//    if( !in.is_open() )
+//    {
+//        printf( "Could not open %s.\n", fileName.c_str() );
+//        return;
+//    }
+//    while( !in.eof() )
+//    {
+//        in >> name;
+//        in >> points;
+//        addScore( name, points );
+//    }
+//    in.close();
+//}
 
 std::vector<Node> ScoreBoard::getScoreBoardList() const
 {

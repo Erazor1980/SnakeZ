@@ -4,15 +4,15 @@
 
 #define MAX_NUMBER_SCORES   (10)    /* maximal number of entries in the high score list */
 
-struct Node
+class Node
 {
+public:
     Node( const std::string name, const int points )
     {
         m_name      = name;
         m_points    = points;
         mp_nextNode = NULL;
     }
-    ~Node(){}
 
     void setNext( Node* next )
     {
@@ -30,8 +30,8 @@ public:
     ScoreBoard();
     ~ScoreBoard();
 
-    void writeToFile( const std::string fileName = "highscore.txt" );
-    void loadFromFile( const std::string fileName = "highscore.txt" );
+    void writeToFile( const std::string fileName = "highscore.bin" );
+    void loadFromFile( const std::string fileName = "highscore.bin" );
     bool isNotEmpty()
     {
         if( mp_firstNode == NULL )
