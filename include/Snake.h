@@ -1,6 +1,7 @@
 #pragma once
 #include "defines.h"
 #include "PowerUp.h"
+#include "ScoreBoard.h"
 
 //TODO  - highscore speichern
 //      - anzeige von punkten UND schwanzlänge (die extra tracken)
@@ -46,8 +47,9 @@ private:
     void drawScene();
     void drawIntoTile( const int x, const int y, const cv::Mat& img );
     void drawGameOver();
+    void displayHighScore( const ScoreBoard& sb );      /* to be able to use it with "personal" SBs */
 
-    cv::Point2i findFreeTile( bool isPU = false );         /* considering head, all tail parts and food/PU etc */
+    cv::Point2i findFreeTile( bool isPU = false );      /* considering head, all tail parts and food/PU etc */
 
     int m_tilesX            = 30;
     int m_tilesY            = 20;
@@ -86,4 +88,8 @@ private:
     double m_timeMove       = 0.1;      /* time till next move in seconds (current) -> i.a. for boosts */
     double m_lastTimeMove   = 0.1;      /* time till next move in seconds (selected in menu) -> for reset */
     clock_t m_timerNextMove;            /* for tracking time between moves */
+
+    // highscores
+    ScoreBoard m_overallScoreBoard;
+
 };

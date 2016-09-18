@@ -43,6 +43,19 @@ SnakeGame::SnakeGame( const int tilesX, const int tilesY, const std::vector< cv:
     m_headPos = cv::Point2i( m_tilesX / 2, m_tilesY / 2 );
 
     resetGame();
+
+    /*m_overallScoreBoard.addScore( "luki", 1 );
+    m_overallScoreBoard.addScore( "luki", 2 );
+    m_overallScoreBoard.addScore( "luki", 3 );
+    m_overallScoreBoard.addScore( "luki", 4 );
+    m_overallScoreBoard.addScore( "simi", 5 );
+    m_overallScoreBoard.addScore( "simi", 15 );
+    m_overallScoreBoard.addScore( "simi", 6 );
+    m_overallScoreBoard.addScore( "simi", 7 );
+    m_overallScoreBoard.addScore( "simi", 8 );
+    m_overallScoreBoard.addScore( "simi", 9 );
+    m_overallScoreBoard.addScore( "simi", 10 );
+    m_overallScoreBoard.addScore( "simi", 1 );*/
 }
 
 SnakeGame::~SnakeGame()
@@ -62,7 +75,7 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
 
     if( startSound != "" )
     {
-        PlaySound( startSound.c_str(), NULL, SND_ASYNC );
+        //PlaySound( startSound.c_str(), NULL, SND_ASYNC );
     }
     
     const int numPlayers    = (int)m_vPlayerImg.size();
@@ -102,8 +115,11 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
             m_timeMove = 0.3;
         else if( speedLvl == 4 )
             m_timeMove = 0.1;
-        sprintf_s( lvlText, "(S)peed level: %d", speedLvl );
-        cv::putText( m_gameImg, lvlText, cv::Point( m_gameImg.cols / 3, 350 + imgSizeToShow ), fontFace, 3, BLUE, fontThickness );
+        sprintf_s( lvlText, "(L)evel: %d", speedLvl );
+        cv::putText( m_gameImg, lvlText, cv::Point( m_gameImg.cols / 3 + 40, 300 + imgSizeToShow ), fontFace, 3, BLUE, fontThickness );
+
+        cv::putText( m_gameImg, "Start           -> ENTER", cv::Point( m_gameImg.cols / 3, 400 + imgSizeToShow ), fontFace, 2, CYAN, 2 );
+        cv::putText( m_gameImg, "Highscore list  -> 'h'", cv::Point( m_gameImg.cols / 3, 430 + imgSizeToShow ), fontFace, 2, CYAN, 2 );
 
         // display bounding box
         cv::Rect bb = startBB;
@@ -125,11 +141,16 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
             if( idx >= numPlayers )
                 idx = 0;
         }
-        else if( 's' == key || 'S' == key ) // speed level
+        else if( 'l' == key || 'L' == key ) // speed level
         {
             speedLvl++;
             if( speedLvl > 4 )
                 speedLvl = 1;
+        }
+        else if( 'h' == key || 'H' == key ) // show scoreboard
+        {
+            displayHighScore( m_overallScoreBoard );
+            //TODO
         }
         else if( 27 == key )        // esc - finish game
         {
@@ -162,13 +183,7 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
         }       
     }
     m_lastTimeMove = m_timeMove;
-    //startGame();
 }
-
-//void SnakeGame::startGame()
-//{
-//    //m_timerPU = clock();
-//}
 
 void SnakeGame::resetGame()
 {
@@ -343,6 +358,7 @@ void SnakeGame::update()
             {
                 m_bGameOver = true;
                 PlaySound( "D:\\Projects\\_sounds_\\gameover.wav", NULL, SND_ASYNC );
+                m_overallScoreBoard.addScore( m_vPlayerNames[ m_currPlayerIdx ], m_score );
                 return;
             }
         }
@@ -354,6 +370,7 @@ void SnakeGame::update()
             {
                 m_bGameOver = true;
                 PlaySound( "D:\\Projects\\_sounds_\\gameover.wav", NULL, SND_ASYNC );
+                m_overallScoreBoard.addScore( m_vPlayerNames[ m_currPlayerIdx ], m_score );
                 return;
             }
         }
@@ -481,6 +498,51 @@ void SnakeGame::drawGameOver()
     cv::putText( m_gameImg, "Close game -> press ESC", cv::Point( x, m_gameImg.rows / 2 + 40 ), fontFace, 1.5, RED, 2 );
     cv::putText( m_gameImg, "New game   -> press Enter", cv::Point( x, m_gameImg.rows / 2 + 70 ), fontFace, 1.5, RED, 2 );
     cv::putText( m_gameImg, "Start menu -> press 's'", cv::Point( x, m_gameImg.rows / 2 + 100 ), fontFace, 1.5, RED, 2 );
+}
+
+void SnakeGame::displayHighScore( const ScoreBoard& sb )
+{
+    int fontFace        = cv::FONT_HERSHEY_PLAIN;
+    int fontScale       = 4;
+    int fontThickness   = 3;
+
+    std::vector<Node> vNodes = sb.getScoreBoardList();
+
+    // fill up the list with default values, if its too small
+    while( vNodes.size() < MAX_NUMBER_SCORES )
+    {
+        vNodes.push_back( Node( "---", 0 ) );
+    }
+
+    while( true )
+    {
+        // clear screen
+        m_gameImg.setTo( cv::Scalar( 0, 0, 0 ) );
+
+        // display highscore title
+        cv::putText( m_gameImg, "H I G H S C O R E", cv::Point( m_gameImg.cols / 3 - 20, 100 ), fontFace, fontScale, GREEN, fontThickness );
+
+        // display highscore list
+        const int startX    = m_gameImg.cols / 5;
+        const int startY    = 200;
+        const int diffY     = 70;
+        for( int i = 0; i < vNodes.size(); ++i )
+        {
+            cv::putText( m_gameImg, std::to_string( i + 1 ) + ":", cv::Point( startX, startY + i * diffY ), fontFace, 3, WHITE, fontThickness );
+            cv::putText( m_gameImg, vNodes[ i ].m_name, cv::Point( startX + 150, startY + i * diffY ), fontFace, 3, WHITE, fontThickness );
+            cv::putText( m_gameImg, std::to_string( vNodes[ i ].m_points ), cv::Point( startX + 550, startY + i * diffY ), fontFace, 3, WHITE, fontThickness );
+        }
+
+        cv::imshow( m_gameWndName, m_gameImg );
+
+        int key = cv::waitKey( 0 );
+
+        if( 27 == key )        // esc - back to main menu
+        {
+            return;
+        }
+    }
+
 }
 
 cv::Point2i SnakeGame::findFreeTile( bool isPU )
