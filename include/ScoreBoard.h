@@ -55,8 +55,8 @@ public:
 
     std::vector< Node > getScoreBoardList() const;
     
-    // new high score -> returns true
-    bool addScore( const std::string name, const int points );
+    // returns position in the highscore list (0-9), -1 -> out of list
+    int addScore( const std::string name, const int points );
 
 private:
     void reset();

@@ -3,16 +3,15 @@
 #include "PowerUp.h"
 #include "ScoreBoard.h"
 
-//TODO  - highscore speichern
+//TODO  
 //      - anzeige von punkten UND schwanzlänge (die extra tracken)
-//      - anzeige restzeit vom boost
 //      - in den schwanz laufen evtl besser (oder überhaupt) darstellen
 
 
 
 #define CONNECT_TAIL_PARTS      (1)
-#define MIN_TIME_FOR_NEXT_PU    (4)    /* minimum time in seconds for next PU */
-#define MAX_TIME_FOR_NEXT_PU    (8)    /* maximum time in seconds for next PU */
+#define MIN_TIME_FOR_NEXT_PU    (4)    /* minimum time in seconds for next power up */
+#define MAX_TIME_FOR_NEXT_PU    (8)    /* maximum time in seconds for next power up */
 
 enum eMovDirection
 {
@@ -47,7 +46,7 @@ private:
     void drawScene();
     void drawIntoTile( const int x, const int y, const cv::Mat& img );
     void drawGameOver();
-    void displayHighScore( const ScoreBoard& sb );      /* to be able to use it with "personal" SBs */
+    void displayHighScore( const ScoreBoard& sb, const int posHS = -1 );      /* to be able to use it with "personal" SBs */
 
     cv::Point2i findFreeTile( bool isPU = false );      /* considering head, all tail parts and food/PU etc */
 

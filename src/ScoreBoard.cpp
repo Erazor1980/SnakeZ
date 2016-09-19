@@ -124,11 +124,13 @@ std::vector<Node> ScoreBoard::getScoreBoardList() const
     return vNodes;
 }
 
-bool ScoreBoard::addScore( const std::string name, const int points )
+int ScoreBoard::addScore( const std::string name, const int points )
 {
+    int posInList = 0;
     if( mp_firstNode == NULL )
     {
         mp_firstNode = new Node( name, points );
+        posInList = 0;
     }
     else
     {
@@ -138,37 +140,41 @@ bool ScoreBoard::addScore( const std::string name, const int points )
             Node* next = mp_firstNode;
             mp_firstNode = new Node( name, points );
             mp_firstNode->setNext( next );
-            return true;
+            posInList = 0;
         }
-
-        // at least one entry in the list
-        Node* currNode = mp_firstNode;
-        while( true )
+        else
         {
-            // end of list
-            if( currNode->mp_nextNode == NULL )
+            // at least one entry in the list
+            Node* currNode = mp_firstNode;
+            while( true )
             {
-                currNode->mp_nextNode = new Node( name, points );
-                break;
-            }
+                posInList++;
 
-            // mid of the list
-            if( points > currNode->mp_nextNode->m_points )
-            {
-                Node* newNode = new Node( name, points );
-                newNode->setNext( currNode->mp_nextNode );
-                currNode->setNext( newNode );
-                break;
-            }
-            else
-            {
-                currNode = currNode->mp_nextNode;
+                // end of list
+                if( currNode->mp_nextNode == NULL )
+                {
+                    currNode->mp_nextNode = new Node( name, points );
+                    break;
+                }
+
+                // mid of the list
+                if( points > currNode->mp_nextNode->m_points )
+                {
+                    Node* newNode = new Node( name, points );
+                    newNode->setNext( currNode->mp_nextNode );
+                    currNode->setNext( newNode );
+                    break;
+                }
+                else
+                {
+                    currNode = currNode->mp_nextNode;
+                }
             }
         }
 
         // delete last element, if list > MAX_NUMBER_SCORES
         int i = 1;
-        currNode = mp_firstNode;
+        Node* currNode = mp_firstNode;
         while( true )
         {
             if( currNode->mp_nextNode )
@@ -193,7 +199,11 @@ bool ScoreBoard::addScore( const std::string name, const int points )
             }
         }
     }
-    return false;
+    if( posInList >= MAX_NUMBER_SCORES )
+    {
+        posInList = -1;
+    }
+    return posInList;
 }
 
 

@@ -77,7 +77,7 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
     const int yStart        = 200;
     
     char lvlText[ 100 ];
-    int speedLvl = 4;
+    int speedLvl = 2;
 
     // selection bounding box and speed level
     const cv::Rect startBB( cv::Point2i( xStart - 20, yStart - 20 ), cv::Point2i( xStart + imgSizeToShow + 20, yStart + imgSizeToShow + 20 ) );
@@ -237,6 +237,10 @@ void SnakeGame::update()
                 m_bGameOver = false;
                 startMenu();
             }
+            else if( key == 'h' )   // 'h' = high score list
+            {
+                displayHighScore( m_overallScoreBoard );
+            }
         }
         return;
     }
@@ -349,11 +353,17 @@ void SnakeGame::update()
             if( m_headPos.x >= m_tilesX || m_headPos.x < 0 || m_headPos.y >= m_tilesY || m_headPos.y < 0 )
             {
                 m_bGameOver = true;
-                PlaySound( "D:\\Projects\\_sounds_\\gameover.wav", NULL, SND_ASYNC );
-                if( m_overallScoreBoard.addScore( m_vPlayerNames[ m_currPlayerIdx ], m_score ) )
+                int posHighScore = m_overallScoreBoard.addScore( m_vPlayerNames[ m_currPlayerIdx ], m_score );
+                if( 0 == posHighScore )
                 {
                     PlaySound( "D:\\Projects\\_sounds_\\highScore.wav", NULL, SND_ASYNC );
                 }
+                else
+                {
+                    PlaySound( "D:\\Projects\\_sounds_\\gameover.wav", NULL, SND_ASYNC );
+                }
+                if( posHighScore >= 0 )
+                    displayHighScore( m_overallScoreBoard, posHighScore );
                 return;
             }
         }
@@ -364,11 +374,17 @@ void SnakeGame::update()
             if( m_headPos == mp_tailParts[ i ] )
             {
                 m_bGameOver = true;
-                PlaySound( "D:\\Projects\\_sounds_\\gameover.wav", NULL, SND_ASYNC );
-                if( m_overallScoreBoard.addScore( m_vPlayerNames[ m_currPlayerIdx ], m_score ) )
+                int posHighScore = m_overallScoreBoard.addScore( m_vPlayerNames[ m_currPlayerIdx ], m_score );
+                if( 0 == posHighScore )
                 {
                     PlaySound( "D:\\Projects\\_sounds_\\highScore.wav", NULL, SND_ASYNC );
                 }
+                else
+                {
+                    PlaySound( "D:\\Projects\\_sounds_\\gameover.wav", NULL, SND_ASYNC );
+                }
+                if( posHighScore >= 0 )
+                    displayHighScore( m_overallScoreBoard, posHighScore );
                 return;
             }
         }
@@ -496,9 +512,10 @@ void SnakeGame::drawGameOver()
     cv::putText( m_gameImg, "Close game -> press ESC", cv::Point( x, m_gameImg.rows / 2 + 40 ), fontFace, 1.5, RED, 2 );
     cv::putText( m_gameImg, "New game   -> press Enter", cv::Point( x, m_gameImg.rows / 2 + 70 ), fontFace, 1.5, RED, 2 );
     cv::putText( m_gameImg, "Start menu -> press 's'", cv::Point( x, m_gameImg.rows / 2 + 100 ), fontFace, 1.5, RED, 2 );
+    cv::putText( m_gameImg, "High Score -> press 'h'", cv::Point( x, m_gameImg.rows / 2 + 130 ), fontFace, 1.5, RED, 2 );
 }
 
-void SnakeGame::displayHighScore( const ScoreBoard& sb )
+void SnakeGame::displayHighScore( const ScoreBoard& sb, const int posHS )
 {
     int fontFace        = cv::FONT_HERSHEY_PLAIN;
     int fontScale       = 4;
@@ -512,26 +529,31 @@ void SnakeGame::displayHighScore( const ScoreBoard& sb )
         vNodes.push_back( Node( "---", 0 ) );
     }
 
+    cv::Mat imgHS( m_gameImg.size(), CV_8UC3 );
+
     while( true )
     {
         // clear screen
-        m_gameImg.setTo( cv::Scalar( 0, 0, 0 ) );
+        imgHS.setTo( cv::Scalar( 0, 0, 0 ) );
 
         // display highscore title
-        cv::putText( m_gameImg, "H I G H S C O R E", cv::Point( m_gameImg.cols / 3 - 20, 100 ), fontFace, fontScale, GREEN, fontThickness );
+        cv::putText( imgHS, "H I G H S C O R E", cv::Point( imgHS.cols / 3 - 20, 100 ), fontFace, fontScale, GREEN, fontThickness );
 
         // display highscore list
-        const int startX    = m_gameImg.cols / 5;
+        const int startX    = imgHS.cols / 5;
         const int startY    = 200;
         const int diffY     = 70;
         for( int i = 0; i < vNodes.size(); ++i )
         {
-            cv::putText( m_gameImg, std::to_string( i + 1 ) + ":", cv::Point( startX, startY + i * diffY ), fontFace, 3, WHITE, fontThickness );
-            cv::putText( m_gameImg, vNodes[ i ].m_name, cv::Point( startX + 150, startY + i * diffY ), fontFace, 3, WHITE, fontThickness );
-            cv::putText( m_gameImg, std::to_string( vNodes[ i ].m_points ), cv::Point( startX + 550, startY + i * diffY ), fontFace, 3, WHITE, fontThickness );
+            cv::Scalar color = WHITE;
+            if( i == posHS )
+                color = RED;
+            cv::putText( imgHS, std::to_string( i + 1 ) + ":", cv::Point( startX, startY + i * diffY ), fontFace, 3, color, fontThickness );
+            cv::putText( imgHS, vNodes[ i ].m_name, cv::Point( startX + 150, startY + i * diffY ), fontFace, 3, color, fontThickness );
+            cv::putText( imgHS, std::to_string( vNodes[ i ].m_points ), cv::Point( startX + 550, startY + i * diffY ), fontFace, 3, color, fontThickness );
         }
 
-        cv::imshow( m_gameWndName, m_gameImg );
+        cv::imshow( m_gameWndName, imgHS );
 
         int key = cv::waitKey( 0 );
 

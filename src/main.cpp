@@ -34,7 +34,6 @@ int main()
     vPowerUps.push_back( PowerUp( "rocket", cv::imread( "D:/Projects/_images_/rocket.png", 1 ), lifeTime, boostTime,
                                   "D:\\Projects\\_sounds_\\rocketShowUp.wav", "D:\\Projects\\_sounds_\\rocketConsume.wav" ) );
 
-    //TODO evtl teste einbauen, ob alles richtig geladen wurde...
 
 	cv::namedWindow( "SnakeZ", cv::WINDOW_AUTOSIZE );
     SnakeGame myGame( 15, 10, vPlayerImg, vPlayerNames, vFoodImg, vFoodSounds, vPowerUps, 100, true );
