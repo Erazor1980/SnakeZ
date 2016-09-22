@@ -156,19 +156,19 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
             //      oder halt structs (wie bei power ups) für die player machen, mit sound, name usw
             if( m_vPlayerNames[ idx ] == "JULIA" )
             {
-                PlaySound( "D:\\Projects\\_sounds_\\julia.wav", NULL, SND_ASYNC );
+                PlaySound( std::string( PATH_TO_SOUNDS + "julia.wav" ).c_str(), NULL, SND_ASYNC );
             }
             else if( m_vPlayerNames[ idx ] == "MELINA" )
             {
-                PlaySound( "D:\\Projects\\_sounds_\\melina.wav", NULL, SND_ASYNC );
+                PlaySound( std::string( PATH_TO_SOUNDS + "melina.wav" ).c_str(), NULL, SND_ASYNC );
             }
             else if( m_vPlayerNames[ idx ] == "MAMA" )
             {
-                PlaySound( "D:\\Projects\\_sounds_\\simone.wav", NULL, SND_ASYNC );
+                PlaySound( std::string( PATH_TO_SOUNDS + "simone.wav" ).c_str(), NULL, SND_ASYNC );
             }
             else if( m_vPlayerNames[ idx ] == "PAPA" )
             {
-                PlaySound( "D:\\Projects\\_sounds_\\lukas.wav", NULL, SND_ASYNC );
+                PlaySound( std::string( PATH_TO_SOUNDS + "lukas.wav" ).c_str(), NULL, SND_ASYNC );
             }
 
             break;
@@ -356,11 +356,11 @@ void SnakeGame::update()
                 int posHighScore = m_overallScoreBoard.addScore( m_vPlayerNames[ m_currPlayerIdx ], m_score );
                 if( 0 == posHighScore )
                 {
-                    PlaySound( "D:\\Projects\\_sounds_\\highScore.wav", NULL, SND_ASYNC );
+                    PlaySound( std::string( PATH_TO_SOUNDS + "highScore.wav" ).c_str(), NULL, SND_ASYNC );
                 }
                 else
                 {
-                    PlaySound( "D:\\Projects\\_sounds_\\gameover.wav", NULL, SND_ASYNC );
+                    PlaySound( std::string( PATH_TO_SOUNDS + "gameover.wav" ).c_str(), NULL, SND_ASYNC );
                 }
                 if( posHighScore >= 0 )
                     displayHighScore( m_overallScoreBoard, posHighScore );
@@ -377,11 +377,11 @@ void SnakeGame::update()
                 int posHighScore = m_overallScoreBoard.addScore( m_vPlayerNames[ m_currPlayerIdx ], m_score );
                 if( 0 == posHighScore )
                 {
-                    PlaySound( "D:\\Projects\\_sounds_\\highScore.wav", NULL, SND_ASYNC );
+                    PlaySound( std::string( PATH_TO_SOUNDS + "highScore.wav" ).c_str(), NULL, SND_ASYNC );
                 }
                 else
                 {
-                    PlaySound( "D:\\Projects\\_sounds_\\gameover.wav", NULL, SND_ASYNC );
+                    PlaySound( std::string( PATH_TO_SOUNDS + "gameover.wav" ).c_str(), NULL, SND_ASYNC );
                 }
                 if( posHighScore >= 0 )
                     displayHighScore( m_overallScoreBoard, posHighScore );

@@ -5,20 +5,20 @@ int main()
 {
     // load food images and sounds
     std::vector< cv::Mat > vFoodImg;
-    vFoodImg.push_back( cv::imread( "D:/Projects/_images_/chicken.png", 1 ) );
-    vFoodImg.push_back( cv::imread( "D:/Projects/_images_/iceCream.png", 1 ) );
-    vFoodImg.push_back( cv::imread( "D:/Projects/_images_/soap.png", 1 ) );
+    vFoodImg.push_back( cv::imread( PATH_TO_IMAGES + "chicken.png", 1 ) );
+    vFoodImg.push_back( cv::imread( PATH_TO_IMAGES + "iceCream.png", 1 ) );
+    vFoodImg.push_back( cv::imread( PATH_TO_IMAGES + "soap.png", 1 ) );
     std::vector< std::string > vFoodSounds;
-    vFoodSounds.push_back( "D:\\Projects\\_sounds_\\papaKauen.wav" );
-    vFoodSounds.push_back( "D:\\Projects\\_sounds_\\icecream.wav" );
-    vFoodSounds.push_back( "D:\\Projects\\_sounds_\\blow.wav" );
+    vFoodSounds.push_back( PATH_TO_SOUNDS + "papaKauen.wav" );
+    vFoodSounds.push_back( PATH_TO_SOUNDS + "icecream.wav" );
+    vFoodSounds.push_back( PATH_TO_SOUNDS + "blow.wav" );
 
     // load player images
     std::vector< cv::Mat > vPlayerImg;
-    vPlayerImg.push_back( cv::imread( "D:/Projects/_images_/julia.png", 1 ) );
-    vPlayerImg.push_back( cv::imread( "D:/Projects/_images_/melina.png", 1 ) );
-    vPlayerImg.push_back( cv::imread( "D:/Projects/_images_/mama.png", 1 ) );
-    vPlayerImg.push_back( cv::imread( "D:/Projects/_images_/papa.png", 1 ) );
+    vPlayerImg.push_back( cv::imread( PATH_TO_IMAGES + "julia.png", 1 ) );
+    vPlayerImg.push_back( cv::imread( PATH_TO_IMAGES + "melina.png", 1 ) );
+    vPlayerImg.push_back( cv::imread( PATH_TO_IMAGES + "mama.png", 1 ) );
+    vPlayerImg.push_back( cv::imread( PATH_TO_IMAGES + "papa.png", 1 ) );
 
     // add player names
     std::vector< std::string > vPlayerNames;
@@ -31,14 +31,14 @@ int main()
     int lifeTime = 10;
     int boostTime = 15;
     std::vector< PowerUp > vPowerUps;
-    vPowerUps.push_back( PowerUp( "rocket", cv::imread( "D:/Projects/_images_/rocket.png", 1 ), lifeTime, boostTime,
-                                  "D:\\Projects\\_sounds_\\rocketShowUp.wav", "D:\\Projects\\_sounds_\\rocketConsume.wav" ) );
+    vPowerUps.push_back( PowerUp( "rocket", cv::imread( PATH_TO_IMAGES + "rocket.png", 1 ), lifeTime, boostTime,
+                                  PATH_TO_SOUNDS + "rocketShowUp.wav", PATH_TO_SOUNDS + "rocketConsume.wav" ) );
 
 
 	cv::namedWindow( "SnakeZ", cv::WINDOW_AUTOSIZE );
     SnakeGame myGame( 15, 10, vPlayerImg, vPlayerNames, vFoodImg, vFoodSounds, vPowerUps, 100, true );
 
-    myGame.startMenu( "D:\\Projects\\_sounds_\\start.wav", "SnakeZ" );
+    myGame.startMenu( PATH_TO_SOUNDS + "start.wav", "SnakeZ" );
 
     while( !myGame.finishGame() )
     {
