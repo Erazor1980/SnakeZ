@@ -561,7 +561,7 @@ void SnakeGame::displayHighScore( const ScoreBoard& sb, const int posHS )
         {
             //TODO add personal highscores, and display them
         }
-        else
+        else if( key == 27 || key == 13 || key == 'h' )
         {
             return;
         }
