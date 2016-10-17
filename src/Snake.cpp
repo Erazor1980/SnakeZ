@@ -107,6 +107,11 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
             m_timeMove = 0.3;
         else if( speedLvl == 4 )
             m_timeMove = 0.1;
+        else if( speedLvl == 5 )
+            m_timeMove = 0.05;
+        else if( speedLvl == 6 )
+            m_timeMove = 0.025;
+
         sprintf_s( lvlText, "(L)evel: %d", speedLvl );
         cv::putText( m_gameImg, lvlText, cv::Point( m_gameImg.cols / 3 + 40, 300 + imgSizeToShow ), fontFace, 3, BLUE, fontThickness );
 
@@ -136,7 +141,7 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
         else if( 'l' == key || 'L' == key ) // speed level
         {
             speedLvl++;
-            if( speedLvl > 4 )
+            if( speedLvl > 6 )
                 speedLvl = 1;
         }
         else if( 'h' == key || 'H' == key ) // show scoreboard
@@ -645,8 +650,11 @@ void SnakeGame::keyHandling( const int keyCode )
     {
         m_bEasyMode = !m_bEasyMode;
     }
-    else if( 'p' == keyCode )       // pause game
+    else if( ' ' == keyCode )       // pause game
     {
-        cv::waitKey( 0 );
+        while( cv::waitKey( 0 ) != ' ' )
+        {
+            // wait till space is pressed
+        }
     }
 }

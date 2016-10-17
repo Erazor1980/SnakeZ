@@ -77,6 +77,7 @@ void PowerUp::update()
                     // PU consumed!
                     m_timer = -1;
                     m_state = _BOOST;
+                    mp_snakeGame->m_score += 2;
                     PlaySound( m_consumeSound.c_str(), NULL, SND_ASYNC );
                     enableBoostEffect();
                 }
