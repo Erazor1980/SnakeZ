@@ -1,6 +1,8 @@
 #pragma once
 #include "defines.h"
 
+#define NEW_FOOD_FROM_CHEST (5)
+
 class SnakeGame;
 
 enum ePU_State
@@ -19,12 +21,16 @@ public:
 
     // new PowerUp between minTime and maxTime
     void init( SnakeGame* pSnakeGame, int minTime = 5, int maxTime = 5 );
-    void update();
-    void draw();
+    virtual void update();
+    virtual void draw();
 
     cv::Point2i getPos() const
     {
         return m_pos;
+    }
+    std::string getName() const
+    {
+        return m_name;
     }
 protected:
     void calcNewTime();
@@ -57,6 +63,8 @@ class Rocket : public PowerUp
 public:
     Rocket( const cv::String name, const cv::Mat img, const int lifeTime, const int boostTime,
              const std::string showUpSound, const std::string consumeSound );
+
+    void draw();
 private:
     void enableBoostEffect();
     void disableBoostEffect();
@@ -67,6 +75,9 @@ class Chest : public PowerUp
 public:
     Chest( const cv::String name, const cv::Mat img, const int lifeTime, const int boostTime,
            const std::string showUpSound, const std::string consumeSound );
+
+    void draw();
+    void update();
 private:
     void enableBoostEffect();
     void disableBoostEffect();

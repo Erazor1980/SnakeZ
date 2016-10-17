@@ -186,9 +186,7 @@ void SnakeGame::resetGame()
 {
     // clear food vector and create first random food
     m_vFoodInGame.clear();
-    const int foodIdx = rand() % m_vFoodImg.size();
-    Food firstFood( &m_vFoodImg[ foodIdx ], findFreeTile( false ), m_vFoodSounds[ foodIdx ] );
-    m_vFoodInGame.push_back( firstFood );
+    addRandomFood();
 
     m_headPos       = cv::Point2i( m_tilesX / 2, m_tilesY / 2 );
     m_movDir        = RIGHT;
@@ -352,10 +350,7 @@ void SnakeGame::update()
             // create new food, if none left
             if( m_vFoodInGame.size() == 0 )
             {
-                const int foodIdx = rand() % m_vFoodImg.size();
-                m_vFoodInGame.push_back( Food( &m_vFoodImg[ foodIdx ], findFreeTile( false ), m_vFoodSounds[ foodIdx ] ) );
-
-                m_vFoodInGame.push_back( Food( &m_vFoodImg[ foodIdx ], findFreeTile( false ), m_vFoodSounds[ foodIdx ] ) );
+                addRandomFood();
             }
         }
 
@@ -420,6 +415,12 @@ void SnakeGame::update()
         keyHandling( keyCode );
         return;
     }
+}
+
+void SnakeGame::addRandomFood()
+{
+    const int foodIdx = rand() % ( m_vFoodImg.size() - 1 ); // everything but the coin (last in the list)
+    m_vFoodInGame.push_back( Food( &m_vFoodImg[ foodIdx ], "random", findFreeTile( false ), m_vFoodSounds[ foodIdx ] ) );
 }
 
 cv::Mat SnakeGame::getGameImg()

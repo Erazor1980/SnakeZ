@@ -13,7 +13,7 @@ PowerUp::PowerUp( const cv::String name, const cv::Mat img, const int lifeTime, 
     mp_snakeGame    = NULL;
 }
 
-void PowerUp::init( SnakeGame * pSnakeGame, int minTime, int maxTime )
+void PowerUp::init( SnakeGame* pSnakeGame, int minTime, int maxTime )
 {
     mp_snakeGame    = pSnakeGame;
     m_minTime       = minTime;
@@ -24,7 +24,6 @@ void PowerUp::init( SnakeGame * pSnakeGame, int minTime, int maxTime )
 
     calcNewTime();
 }
-
 
 void PowerUp::update()
 {
@@ -104,33 +103,6 @@ void PowerUp::update()
     }
 }
 
-void PowerUp::draw()
-{
-#if DEBUG_INFOS
-    int fontFace = cv::FONT_HERSHEY_PLAIN;
-    double fontScale = 1.5;
-    int fontThickness = 2;
-    char infosPU[ 255 ];
-    clock_t end         = clock();
-    float elapsedTime   = ( float )( end - m_timer ) / CLOCKS_PER_SEC;
-    sprintf_s( infosPU, "PowerUp status: %d, timer: %0.2f", (int)m_state, elapsedTime );
-    cv::putText( mp_snakeGame->m_gameImg, infosPU, cv::Point( 300, 25 ), fontFace, fontScale, CYAN, fontThickness );
-#endif
-    if( m_state == _BOOST )
-    {
-        int x = mp_snakeGame->m_headPos.x * mp_snakeGame->m_tileSize;
-        int y = mp_snakeGame->m_headPos.y * mp_snakeGame->m_tileSize;
-        cv::rectangle( mp_snakeGame->m_gameImg, cv::Rect( x, y, mp_snakeGame->m_vPlayerImg[ mp_snakeGame->m_currPlayerIdx ].cols - 1, 
-                                                          mp_snakeGame->m_vPlayerImg[ mp_snakeGame->m_currPlayerIdx ].rows - 1 ), RED, 3 );
-    }
-    else if( m_state == _VISIBLE )
-    {
-        int x = m_pos.x * mp_snakeGame->m_tileSize;
-        int y = m_pos.y * mp_snakeGame->m_tileSize;
-        mp_snakeGame->drawIntoTile( x, y, m_img );
-    }
-}
-
 void PowerUp::calcNewTime()
 {
     if( m_minTime == m_maxTime )
@@ -143,6 +115,42 @@ void PowerUp::calcNewTime()
     }
 }
 
+void PowerUp::draw()
+{
+#if DEBUG_INFOS
+    int fontFace = cv::FONT_HERSHEY_PLAIN;
+    double fontScale = 1.5;
+    int fontThickness = 2;
+    char infosPU[ 255 ];
+    clock_t end         = clock();
+    float elapsedTime   = ( float )( end - m_timer ) / CLOCKS_PER_SEC;
+    sprintf_s( infosPU, "PowerUp status: %d, timer: %0.2f", ( int )m_state, elapsedTime );
+    cv::putText( mp_snakeGame->m_gameImg, infosPU, cv::Point( 300, 25 ), fontFace, fontScale, CYAN, fontThickness );
+#endif
+    if( m_state == _VISIBLE )
+    {
+        int x = m_pos.x * mp_snakeGame->m_tileSize;
+        int y = m_pos.y * mp_snakeGame->m_tileSize;
+        mp_snakeGame->drawIntoTile( x, y, m_img );
+    }
+    // draw fuse
+    else if( _BOOST == m_state )
+    {
+        clock_t end         = clock();
+        float elapsedTime   = ( float )( end - m_timer ) / CLOCKS_PER_SEC;
+
+        float timeLeftPerc = 1 - ( elapsedTime / m_boostTime );
+
+        const int length = (int)( ( mp_snakeGame->m_gameImg.cols - 10 ) * timeLeftPerc );
+        cv::Point2i p1( 5, 5 );
+        cv::Point2i p2( 5 + length, 5 );
+        cv::line( mp_snakeGame->m_gameImg, p1, p2, RED, 2 );
+    }
+}
+
+/////////////////////
+////// ROCKET ///////
+/////////////////////
 Rocket::Rocket( const cv::String name, const cv::Mat img, const int lifeTime, const int boostTime,
                 const std::string showUpSound, const std::string consumeSound )
     :
@@ -161,6 +169,22 @@ void Rocket::disableBoostEffect()
     mp_snakeGame->m_addedScoreNumber   = 1;
 }
 
+void Rocket::draw()
+{
+    PowerUp::draw();
+
+    if( m_state == _BOOST )
+    {
+        int x = mp_snakeGame->m_headPos.x * mp_snakeGame->m_tileSize;
+        int y = mp_snakeGame->m_headPos.y * mp_snakeGame->m_tileSize;
+        cv::rectangle( mp_snakeGame->m_gameImg, cv::Rect( x, y, mp_snakeGame->m_vPlayerImg[ mp_snakeGame->m_currPlayerIdx ].cols - 1,
+                                                          mp_snakeGame->m_vPlayerImg[ mp_snakeGame->m_currPlayerIdx ].rows - 1 ), RED, 3 );
+    }
+}
+
+////////////////////
+////// CHEST ///////
+////////////////////
 Chest::Chest( const cv::String name, const cv::Mat img, const int lifeTime, const int boostTime,
               const std::string showUpSound, const std::string consumeSound )
     :
@@ -169,10 +193,48 @@ Chest::Chest( const cv::String name, const cv::Mat img, const int lifeTime, cons
 
 void Chest::enableBoostEffect()
 {
+    // remove food
+    mp_snakeGame->m_vFoodInGame.clear();
+
+
+    // create coins
+    const int idx = (int)mp_snakeGame->m_vFoodImg.size() - 1;    // coin is last in the foodImg- and foodSound vector!
+
+    for( int i = 0; i < NEW_FOOD_FROM_CHEST; ++i )
+    {
+        Food coin( &mp_snakeGame->m_vFoodImg[ idx ], "coin", mp_snakeGame->findFreeTile(), mp_snakeGame->m_vFoodSounds[ idx ] );
+        mp_snakeGame->m_vFoodInGame.push_back( coin );
+    }
     int deb = 0;
 }
 
 void Chest::disableBoostEffect()
 {
+    // remove all coins
+    mp_snakeGame->m_vFoodInGame.clear();
+
+    // create new random food
+    mp_snakeGame->addRandomFood();
+
     int deb = 0;
+}
+
+void Chest::update()
+{
+    PowerUp::update();
+
+    // change to _WAIT state, when all coins are collected
+    if( m_state == _BOOST )
+    {
+        if( mp_snakeGame->m_vFoodInGame[ mp_snakeGame->m_vFoodInGame.size() - 1 ].getName() != "coin" )
+        {
+            m_timer = -1;
+            m_state = _WAIT;
+        }
+    }
+}
+
+void Chest::draw()
+{
+    PowerUp::draw();
 }

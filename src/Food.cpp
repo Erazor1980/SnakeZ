@@ -1,11 +1,12 @@
 #include "Food.h"
 #include "Snake.h"
 
-Food::Food( const cv::Mat * pImg, const cv::Point2i pos, const std::string sound )
+Food::Food( const cv::Mat *pImg, const std::string name, const cv::Point2i pos, const std::string sound )
 {
     mp_img  = pImg;
     m_pos   = pos;
     m_sound = sound;
+    m_name  = name;
 }
 
 Food::~Food()

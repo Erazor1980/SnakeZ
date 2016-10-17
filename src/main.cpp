@@ -8,10 +8,13 @@ int main()
     vFoodImg.push_back( cv::imread( PATH_TO_IMAGES + "chicken.png", 1 ) );
     vFoodImg.push_back( cv::imread( PATH_TO_IMAGES + "iceCream.png", 1 ) );
     vFoodImg.push_back( cv::imread( PATH_TO_IMAGES + "soap.png", 1 ) );
+    vFoodImg.push_back( cv::imread( PATH_TO_IMAGES + "coin.png", 1 ) );     // HAS TO BE LAST!!!!
+
     std::vector< std::string > vFoodSounds;
     vFoodSounds.push_back( PATH_TO_SOUNDS + "papaKauen.wav" );
     vFoodSounds.push_back( PATH_TO_SOUNDS + "icecream.wav" );
     vFoodSounds.push_back( PATH_TO_SOUNDS + "blow.wav" );
+    vFoodSounds.push_back( PATH_TO_SOUNDS + "coinFlip.wav" );               // HAS TO BE LAST!!!!
 
     // load player images
     std::vector< cv::Mat > vPlayerImg;
@@ -36,9 +39,12 @@ int main()
     std::vector< PowerUp* > vPowerUps;
     PowerUp* myRocket = new Rocket( "rocket", cv::imread( PATH_TO_IMAGES + "rocket.png", 1 ), lifeTime, boostTime,
                                   PATH_TO_SOUNDS + "rocketShowUp.wav", PATH_TO_SOUNDS + "rocketConsume.wav" );
-    vPowerUps.push_back( myRocket );
+    //vPowerUps.push_back( myRocket );
 
-    //vPowerUps[ 0 ]->enableBoostEffect();
+    PowerUp* myChest = new Chest( "chest", cv::imread( PATH_TO_IMAGES + "chest.png", 1 ), lifeTime, boostTime,
+                                   PATH_TO_SOUNDS + "fanfare.wav", PATH_TO_SOUNDS + "floop.wav" );
+    vPowerUps.push_back( myChest );
+
     
 #if 1
 	cv::namedWindow( "SnakeZ", cv::WINDOW_AUTOSIZE );

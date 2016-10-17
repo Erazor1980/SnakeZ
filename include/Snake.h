@@ -42,6 +42,7 @@ public:
 
     friend PowerUp;
     friend Rocket;
+    friend Chest;
     friend Food;
 private:
     void resetGame();
@@ -50,6 +51,8 @@ private:
     void drawIntoTile( const int x, const int y, const cv::Mat& img );
     void drawGameOver();
     void displayHighScore( const ScoreBoard& sb, const int posHS = -1 );      /* to be able to use it with "personal" SBs */
+
+    void addRandomFood();
 
     cv::Point2i findFreeTile( bool isPU = false );      /* considering head, all tail parts and food/PU etc */
 
