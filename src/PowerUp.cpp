@@ -147,13 +147,13 @@ Rocket::Rocket( const cv::String name, const cv::Mat img, const int lifeTime, co
 void Rocket::enableBoostEffect()
 {
     mp_snakeGame->m_timeMove           /= 2;
-    mp_snakeGame->m_addedScoreNumber   = 2;
+    mp_snakeGame->m_addedScoreNumber++;
 }
 
 void Rocket::disableBoostEffect()
 {
     mp_snakeGame->m_timeMove           = mp_snakeGame->m_lastTimeMove;
-    mp_snakeGame->m_addedScoreNumber   = 1;
+    mp_snakeGame->m_addedScoreNumber--;
 }
 
 void Rocket::draw()
@@ -165,7 +165,16 @@ void Rocket::draw()
         int x = mp_snakeGame->m_headPos.x * mp_snakeGame->m_tileSize;
         int y = mp_snakeGame->m_headPos.y * mp_snakeGame->m_tileSize;
         cv::rectangle( mp_snakeGame->m_gameImg, cv::Rect( x, y, mp_snakeGame->m_vPlayerImg[ mp_snakeGame->m_currPlayerIdx ].cols - 1,
-                                                          mp_snakeGame->m_vPlayerImg[ mp_snakeGame->m_currPlayerIdx ].rows - 1 ), RED, 3 );
+                                                          mp_snakeGame->m_vPlayerImg[ mp_snakeGame->m_currPlayerIdx ].rows - 1 ), RED, 5 );
+        clock_t end         = clock();
+        float elapsedTime   = ( float )( end - m_timer ) / CLOCKS_PER_SEC;
+
+        float timeLeftPerc = 1 - ( elapsedTime / m_boostTime );
+
+        const int length = ( int )( mp_snakeGame->m_tileSize * timeLeftPerc );
+        cv::Point2i p1( mp_snakeGame->m_headPos.x * mp_snakeGame->m_tileSize, mp_snakeGame->m_headPos.y * mp_snakeGame->m_tileSize );
+        cv::Point2i p2( p1.x + length, p1.y );
+        cv::line( mp_snakeGame->m_gameImg, p1, p2, GREEN, 3 );
     }
 }
 
@@ -193,7 +202,7 @@ void Chest::enableBoostEffect()
     }
     
     // more points for collecting coins
-    mp_snakeGame->m_addedScoreNumber = 3;
+    mp_snakeGame->m_addedScoreNumber++;
 }
 
 void Chest::disableBoostEffect()
@@ -205,7 +214,7 @@ void Chest::disableBoostEffect()
     mp_snakeGame->addRandomFood();
 
     // reset points for collecting food
-    mp_snakeGame->m_addedScoreNumber = 1;
+    mp_snakeGame->m_addedScoreNumber--;
 }
 
 void Chest::update()
@@ -219,6 +228,7 @@ void Chest::update()
         {
             m_timer = -1;
             m_state = _WAIT;
+            disableBoostEffect();
         }
     }
 }
@@ -238,6 +248,6 @@ void Chest::draw()
         const int length = ( int )( ( mp_snakeGame->m_gameImg.cols - 10 ) * timeLeftPerc );
         cv::Point2i p1( 5, 5 );
         cv::Point2i p2( 5 + length, 5 );
-        cv::line( mp_snakeGame->m_gameImg, p1, p2, RED, 4 );
+        cv::line( mp_snakeGame->m_gameImg, p1, p2, CYAN, 4 );
     }
 }

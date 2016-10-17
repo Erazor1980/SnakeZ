@@ -5,9 +5,8 @@
 #include "ScoreBoard.h"
 
 //TODO  
-//      - anzeige von punkten UND schwanzlänge (die extra tracken)
+//      (- anzeige von punkten UND schwanzlänge (die extra tracken))
 //      - in den schwanz laufen evtl besser (oder überhaupt) darstellen
-
 
 
 #define CONNECT_TAIL_PARTS      (1)
