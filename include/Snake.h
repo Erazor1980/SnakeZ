@@ -1,6 +1,7 @@
 #pragma once
 #include "defines.h"
 #include "PowerUp.h"
+#include "Food.h"
 #include "ScoreBoard.h"
 
 //TODO  
@@ -26,7 +27,7 @@ class SnakeGame
 {
 public:
     SnakeGame( const int tilesX, const int tilesY, const std::vector< cv::Mat > vPlayerImg, const std::vector< std::string > vPlayerNames, 
-               const std::vector< cv::Mat > vFoodImg, const std::vector< std::string > vFoodSounds, const std::vector< PowerUp > vPowerUps,
+               const std::vector< cv::Mat > vFoodImg, const std::vector< std::string > vFoodSounds, const std::vector< PowerUp* > vPowerUps,
                const int tileSize = 50, const bool easyMode = true );
     ~SnakeGame();
 
@@ -40,6 +41,8 @@ public:
     cv::Mat getGameImg();
 
     friend PowerUp;
+    friend Rocket;
+    friend Food;
 private:
     void resetGame();
     void updateTailParts();
@@ -62,23 +65,26 @@ private:
     bool m_bFinishGame      = false;
 
     cv::Point2i m_headPos;              /* position of the head in tiles ( x, y ) */
-    cv::Point2i m_foodPos;
     cv::Point2i* mp_tailParts;
     cv::Scalar* mp_tailColors;
     int m_numTailParts      = 0;
     std::string m_gameWndName;
 
-    std::vector< cv::Mat > m_vPlayerImg;
-    std::vector< std::string > m_vPlayerNames;
-    int m_currPlayerIdx     = 0;
+    std::vector< cv::Mat >      m_vPlayerImg;
+    std::vector< std::string >  m_vPlayerNames;
+    int m_currPlayerIdx         = 0;
 
-    std::vector< PowerUp > m_vPowerUps;
-    int m_currPowerUp       = 0;
+    std::vector< PowerUp* >     m_vPowerUps;
+    int m_currPowerUp           = 0;
 
-    std::vector< cv::Mat > m_vFoodImg;
-    std::vector< std::string > m_vFoodSounds;
-    int m_currFoodIdx       = 0;
+    // food
+    std::vector< cv::Mat >      m_vFoodImg;
+    std::vector< std::string >  m_vFoodSounds;
+    //int m_currFoodIdx           = 0;
+    //cv::Point2i m_foodPos;              /* position of the head in tiles ( x, y ) */
+    std::vector< Food >         m_vFoodInGame;
 
+    // images 
     cv::Mat m_tailImg;
     cv::Mat m_gameImg;
 

@@ -26,12 +26,11 @@ public:
     {
         return m_pos;
     }
-private:
+protected:
     void calcNewTime();
 
-    //TODO für die vererbung! nur diese beiden methoden muss geändert werden!
-    void enableBoostEffect();
-    void disableBoostEffect();
+    virtual void enableBoostEffect() = 0;
+    virtual void disableBoostEffect() = 0;
 
     cv::String  m_name;
     cv::Mat     m_img;
@@ -51,4 +50,24 @@ private:
     std::string m_consumeSound;
 
     SnakeGame*  mp_snakeGame;
+};
+
+class Rocket : public PowerUp
+{
+public:
+    Rocket( const cv::String name, const cv::Mat img, const int lifeTime, const int boostTime,
+             const std::string showUpSound, const std::string consumeSound );
+private:
+    void enableBoostEffect();
+    void disableBoostEffect();
+};
+
+class Chest : public PowerUp
+{
+public:
+    Chest( const cv::String name, const cv::Mat img, const int lifeTime, const int boostTime,
+           const std::string showUpSound, const std::string consumeSound );
+private:
+    void enableBoostEffect();
+    void disableBoostEffect();
 };

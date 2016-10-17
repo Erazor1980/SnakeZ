@@ -2,7 +2,7 @@
 
 //PlaySound( m_vFoodSounds[ m_currFoodIdx ].c_str(), NULL, SND_ASYNC );
 SnakeGame::SnakeGame( const int tilesX, const int tilesY, const std::vector< cv::Mat > vPlayerImg, const std::vector< std::string > vPlayerNames,
-                      const std::vector< cv::Mat > vFoodImg, const std::vector< std::string > vFoodSounds, const std::vector< PowerUp > vPowerUps,
+                      const std::vector< cv::Mat > vFoodImg, const std::vector< std::string > vFoodSounds, const std::vector< PowerUp* > vPowerUps,
                       const int tileSize, const bool easyMode )
 {
     std::srand( ( unsigned int )std::time( 0 ) );
@@ -184,8 +184,11 @@ void SnakeGame::startMenu( const std::string startSound, const std::string wndNa
 
 void SnakeGame::resetGame()
 {
-    m_foodPos.x     = rand() % m_tilesX;
-    m_foodPos.y     = rand() % m_tilesY;
+    // clear food vector and create first random food
+    m_vFoodInGame.clear();
+    const int foodIdx = rand() % m_vFoodImg.size();
+    Food firstFood( &m_vFoodImg[ foodIdx ], findFreeTile( false ), m_vFoodSounds[ foodIdx ] );
+    m_vFoodInGame.push_back( firstFood );
 
     m_headPos       = cv::Point2i( m_tilesX / 2, m_tilesY / 2 );
     m_movDir        = RIGHT;
@@ -216,7 +219,7 @@ void SnakeGame::resetGame()
 
     for( int i = 0; i < m_vPowerUps.size(); ++i )
     {
-        m_vPowerUps[ i ].init( this, MIN_TIME_FOR_NEXT_PU, MAX_TIME_FOR_NEXT_PU );
+        m_vPowerUps[ i ]->init( this, MIN_TIME_FOR_NEXT_PU, MAX_TIME_FOR_NEXT_PU );
     }
 }
 
@@ -252,7 +255,7 @@ void SnakeGame::update()
 
     // power ups
     //TODO m_currPowerUp ist immer 0 bis jetzt, muss noch irgendwo geändert werden! oder halt mehrere erlauben, die selbst ihre zeiten regeln!
-    m_vPowerUps[ m_currPowerUp ].update();
+    m_vPowerUps[ m_currPowerUp ]->update();
 
     // timer and position change
     if( m_bWaitForNextMove == false )
@@ -326,19 +329,34 @@ void SnakeGame::update()
         }   
 
         // food check
-        if( m_headPos == m_foodPos )
         {
-            PlaySound( m_vFoodSounds[ m_currFoodIdx ].c_str(), NULL, SND_ASYNC );
+            auto it = m_vFoodInGame.begin();
+            while( it != m_vFoodInGame.end() )
+            {
+                if( m_headPos == it->getPos() )
+                {
+                    it->playSound();
 
-            // find a free tile for the new food placement
-            m_foodPos = findFreeTile( false );
+                    it = m_vFoodInGame.erase( it );
 
-            mp_tailColors[ m_numTailParts ] = cv::Scalar( rand() % 255, rand() % 255, rand() % 255 );
-            //mp_tailColors[ m_numTailParts ] = cv::Scalar( 200, 200, 200 );
-            m_numTailParts++;
-            m_score += m_addedScoreNumber;
-            
-            m_currFoodIdx = rand() % m_vFoodImg.size();
+                    mp_tailColors[ m_numTailParts ] = cv::Scalar( rand() % 255, rand() % 255, rand() % 255 );
+
+                    m_numTailParts++;
+                    m_score += m_addedScoreNumber;
+                }
+                else
+                {
+                    it++;
+                }
+            }
+            // create new food, if none left
+            if( m_vFoodInGame.size() == 0 )
+            {
+                const int foodIdx = rand() % m_vFoodImg.size();
+                m_vFoodInGame.push_back( Food( &m_vFoodImg[ foodIdx ], findFreeTile( false ), m_vFoodSounds[ foodIdx ] ) );
+
+                m_vFoodInGame.push_back( Food( &m_vFoodImg[ foodIdx ], findFreeTile( false ), m_vFoodSounds[ foodIdx ] ) );
+            }
         }
 
         // boundary check
@@ -467,9 +485,10 @@ void SnakeGame::drawScene()
     drawIntoTile( x, y, m_vPlayerImg[ m_currPlayerIdx ] );
     
     // draw food
-    x = m_foodPos.x * m_tileSize;
-    y = m_foodPos.y * m_tileSize;
-    drawIntoTile( x, y, m_vFoodImg[ m_currFoodIdx ] );
+    for( int i = 0; i < m_vFoodInGame.size(); ++i )
+    {
+        m_vFoodInGame[ i ].draw( this );
+    }
 
     // display points
     int fontFace = cv::FONT_HERSHEY_PLAIN;
@@ -479,7 +498,7 @@ void SnakeGame::drawScene()
     sprintf_s( pts, "%d", m_score );
     cv::putText( m_gameImg, pts, cv::Point( 10, 25 ), fontFace, fontScale, RED, fontThickness );
 
-    m_vPowerUps[ m_currPowerUp ].draw();
+    m_vPowerUps[ m_currPowerUp ]->draw();
 
     // draw border
     if( m_bEasyMode )
@@ -492,6 +511,7 @@ void SnakeGame::drawScene()
     }
 }
 
+//TODO überprüfen, wieso ich überhaupt diese unterscheidung dort hab! sollte eigentlich immer mit tile koordinaten gehen! (also if... zweig)
 void SnakeGame::drawIntoTile( const int x, const int y, const cv::Mat& img )
 {
     if( img.cols < m_tileSize )
@@ -591,7 +611,8 @@ cv::Point2i SnakeGame::findFreeTile( bool isPU )
         // compare to food position (we are power up)
         if( isPU )
         {
-            if( freeTile == m_foodPos )
+            //TODO die ganze methode muss umgeschrieben werden!!!! soll auch mit mehreren food- bzw PU-teilen funktionieren!!! das hier ist nur work around!
+            if( freeTile == m_vFoodInGame[ 0 ].getPos() )
             {
                 continue;
             }
@@ -599,7 +620,7 @@ cv::Point2i SnakeGame::findFreeTile( bool isPU )
         // compare to power up position (we are food)
         else
         {
-            if( freeTile == m_vPowerUps[ m_currPowerUp ].getPos() )
+            if( freeTile == m_vPowerUps[ m_currPowerUp ]->getPos() )
             {
                 continue;
             }

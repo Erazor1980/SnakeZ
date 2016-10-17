@@ -27,14 +27,20 @@ int main()
     vPlayerNames.push_back( "MAMA" );
     vPlayerNames.push_back( "PAPA" );
 
+    /*Rocket test( "rocket", cv::imread( PATH_TO_IMAGES + "rocket.png", 1 ), 11, 12,
+                 PATH_TO_SOUNDS + "rocketShowUp.wav", PATH_TO_SOUNDS + "rocketConsume.wav" );*/
+
     // add powerups
     int lifeTime = 10;
     int boostTime = 15;
-    std::vector< PowerUp > vPowerUps;
-    vPowerUps.push_back( PowerUp( "rocket", cv::imread( PATH_TO_IMAGES + "rocket.png", 1 ), lifeTime, boostTime,
-                                  PATH_TO_SOUNDS + "rocketShowUp.wav", PATH_TO_SOUNDS + "rocketConsume.wav" ) );
+    std::vector< PowerUp* > vPowerUps;
+    PowerUp* myRocket = new Rocket( "rocket", cv::imread( PATH_TO_IMAGES + "rocket.png", 1 ), lifeTime, boostTime,
+                                  PATH_TO_SOUNDS + "rocketShowUp.wav", PATH_TO_SOUNDS + "rocketConsume.wav" );
+    vPowerUps.push_back( myRocket );
 
-
+    //vPowerUps[ 0 ]->enableBoostEffect();
+    
+#if 1
 	cv::namedWindow( "SnakeZ", cv::WINDOW_AUTOSIZE );
     SnakeGame myGame( 15, 10, vPlayerImg, vPlayerNames, vFoodImg, vFoodSounds, vPowerUps, 100, true );
 
@@ -46,8 +52,14 @@ int main()
         //TODO getGamImg vielleicht durch displayGame oder so ersetzen! und innerhalb der klasse anzeigen!
         cv::imshow( "SnakeZ", myGame.getGameImg() );
     }
-    
+#endif
     cv::destroyAllWindows();
 
+    // clear memory
+    for( auto it = vPowerUps.begin(); it != vPowerUps.end(); ++it )
+    {
+        delete ( *it );
+    }
+    vPowerUps.clear();
 	return 0;
 }

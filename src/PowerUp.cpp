@@ -143,16 +143,36 @@ void PowerUp::calcNewTime()
     }
 }
 
-void PowerUp::enableBoostEffect()
+Rocket::Rocket( const cv::String name, const cv::Mat img, const int lifeTime, const int boostTime,
+                const std::string showUpSound, const std::string consumeSound )
+    :
+    PowerUp( name, img, lifeTime, boostTime, showUpSound, consumeSound )
+{}
+
+void Rocket::enableBoostEffect()
 {
-    //TODO mit vererbung arbeiten und abgeleitete klassen für einzelne PU typen erstellen! die ändern dann diese methode!
     mp_snakeGame->m_timeMove           /= 2;
     mp_snakeGame->m_addedScoreNumber   = 2;
 }
 
-void PowerUp::disableBoostEffect()
+void Rocket::disableBoostEffect()
 {
-    //TODO mit vererbung arbeiten und abgeleitete klassen für einzelne PU typen erstellen! die ändern dann diese methode!
     mp_snakeGame->m_timeMove           = mp_snakeGame->m_lastTimeMove;
     mp_snakeGame->m_addedScoreNumber   = 1;
+}
+
+Chest::Chest( const cv::String name, const cv::Mat img, const int lifeTime, const int boostTime,
+              const std::string showUpSound, const std::string consumeSound )
+    :
+    PowerUp( name, img, lifeTime, boostTime, showUpSound, consumeSound )
+{}
+
+void Chest::enableBoostEffect()
+{
+    int deb = 0;
+}
+
+void Chest::disableBoostEffect()
+{
+    int deb = 0;
 }
