@@ -217,7 +217,15 @@ void SnakeGame::resetGame()
 
     for( int i = 0; i < m_vPowerUps.size(); ++i )
     {
-        m_vPowerUps[ i ]->init( this, MIN_TIME_FOR_NEXT_PU, MAX_TIME_FOR_NEXT_PU );
+        if( m_vPowerUps[ i ]->getName() == "chest" )
+        {
+            m_vPowerUps[ i ]->init( this, 25, 30 );
+            //m_vPowerUps[ i ]->init( this, 1, 1 );
+        }
+        else
+        {
+            m_vPowerUps[ i ]->init( this, MIN_TIME_FOR_NEXT_PU, MAX_TIME_FOR_NEXT_PU );
+        }
     }
 }
 
@@ -252,8 +260,11 @@ void SnakeGame::update()
     }
 
     // power ups
-    //TODO m_currPowerUp ist immer 0 bis jetzt, muss noch irgendwo geändert werden! oder halt mehrere erlauben, die selbst ihre zeiten regeln!
-    m_vPowerUps[ m_currPowerUp ]->update();
+    for( int i = 0; i < m_vPowerUps.size(); ++i )
+    {
+        m_vPowerUps[ i ]->update();
+    }
+    
 
     // timer and position change
     if( m_bWaitForNextMove == false )
@@ -420,7 +431,7 @@ void SnakeGame::update()
 void SnakeGame::addRandomFood()
 {
     const int foodIdx = rand() % ( m_vFoodImg.size() - 1 ); // everything but the coin (last in the list)
-    m_vFoodInGame.push_back( Food( &m_vFoodImg[ foodIdx ], "random", findFreeTile( false ), m_vFoodSounds[ foodIdx ] ) );
+    m_vFoodInGame.push_back( Food( &m_vFoodImg[ foodIdx ], "random", findFreeTile(), m_vFoodSounds[ foodIdx ] ) );
 }
 
 cv::Mat SnakeGame::getGameImg()
@@ -499,7 +510,11 @@ void SnakeGame::drawScene()
     sprintf_s( pts, "%d", m_score );
     cv::putText( m_gameImg, pts, cv::Point( 10, 25 ), fontFace, fontScale, RED, fontThickness );
 
-    m_vPowerUps[ m_currPowerUp ]->draw();
+    // draw power ups
+    for( int i = 0; i < m_vPowerUps.size(); ++i )
+    {
+        m_vPowerUps[ i ]->draw();
+    }
 
     // draw border
     if( m_bEasyMode )
@@ -595,7 +610,7 @@ void SnakeGame::displayHighScore( const ScoreBoard& sb, const int posHS )
 
 }
 
-cv::Point2i SnakeGame::findFreeTile( bool isPU )
+cv::Point2i SnakeGame::findFreeTile()
 {
     cv::Point2i freeTile;
     while( true )
@@ -603,30 +618,31 @@ cv::Point2i SnakeGame::findFreeTile( bool isPU )
         freeTile.x = rand() % m_tilesX;
         freeTile.y = rand() % m_tilesY;
         bool occupiedTile = false;
-        // compare to head position
+        // compare with head position
         if( freeTile == m_headPos )
         {
             continue;
         }
 
-        // compare to food position (we are power up)
-        if( isPU )
+        // compare with food positions
+        for( int i = 0; i < m_vFoodInGame.size(); ++i )
         {
-            //TODO die ganze methode muss umgeschrieben werden!!!! soll auch mit mehreren food- bzw PU-teilen funktionieren!!! das hier ist nur work around!
-            if( freeTile == m_vFoodInGame[ 0 ].getPos() )
+            if( freeTile == m_vFoodInGame[ i ].getPos() )
             {
                 continue;
             }
         }
-        // compare to power up position (we are food)
-        else
+
+        // compare to power up positions
+        for( int i = 0; i < m_vPowerUps.size(); ++i )
         {
-            if( freeTile == m_vPowerUps[ m_currPowerUp ]->getPos() )
+            if( freeTile == m_vPowerUps[ i ]->getPos() )
             {
                 continue;
             }
         }
-        
+                
+        // compare to all tail parts
         for( int i = 0; i < m_numTailParts; ++i )
         {
             if( freeTile == mp_tailParts[ i ] )

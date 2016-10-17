@@ -54,7 +54,7 @@ private:
 
     void addRandomFood();
 
-    cv::Point2i findFreeTile( bool isPU = false );      /* considering head, all tail parts and food/PU etc */
+    cv::Point2i findFreeTile();         /* considering head, all tail parts and food/PU etc */
 
     int m_tilesX            = 30;
     int m_tilesY            = 20;
@@ -78,13 +78,11 @@ private:
     int m_currPlayerIdx         = 0;
 
     std::vector< PowerUp* >     m_vPowerUps;
-    int m_currPowerUp           = 0;
+    //int m_currPowerUp           = 0;
 
     // food
     std::vector< cv::Mat >      m_vFoodImg;
     std::vector< std::string >  m_vFoodSounds;
-    //int m_currFoodIdx           = 0;
-    //cv::Point2i m_foodPos;              /* position of the head in tiles ( x, y ) */
     std::vector< Food >         m_vFoodInGame;
 
     // images 

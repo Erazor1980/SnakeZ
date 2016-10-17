@@ -44,7 +44,7 @@ void PowerUp::update()
             if( elapsedTime > m_newTime )
             {
                 // create new PU
-                m_pos = mp_snakeGame->findFreeTile( true );
+                m_pos = mp_snakeGame->findFreeTile();
                 PlaySound( m_showUpSound.c_str(), NULL, SND_ASYNC );
 
                 m_timer = -1;
@@ -133,19 +133,6 @@ void PowerUp::draw()
         int y = m_pos.y * mp_snakeGame->m_tileSize;
         mp_snakeGame->drawIntoTile( x, y, m_img );
     }
-    // draw fuse
-    else if( _BOOST == m_state )
-    {
-        clock_t end         = clock();
-        float elapsedTime   = ( float )( end - m_timer ) / CLOCKS_PER_SEC;
-
-        float timeLeftPerc = 1 - ( elapsedTime / m_boostTime );
-
-        const int length = (int)( ( mp_snakeGame->m_gameImg.cols - 10 ) * timeLeftPerc );
-        cv::Point2i p1( 5, 5 );
-        cv::Point2i p2( 5 + length, 5 );
-        cv::line( mp_snakeGame->m_gameImg, p1, p2, RED, 2 );
-    }
 }
 
 /////////////////////
@@ -195,8 +182,7 @@ void Chest::enableBoostEffect()
 {
     // remove food
     mp_snakeGame->m_vFoodInGame.clear();
-
-
+    
     // create coins
     const int idx = (int)mp_snakeGame->m_vFoodImg.size() - 1;    // coin is last in the foodImg- and foodSound vector!
 
@@ -205,7 +191,9 @@ void Chest::enableBoostEffect()
         Food coin( &mp_snakeGame->m_vFoodImg[ idx ], "coin", mp_snakeGame->findFreeTile(), mp_snakeGame->m_vFoodSounds[ idx ] );
         mp_snakeGame->m_vFoodInGame.push_back( coin );
     }
-    int deb = 0;
+    
+    // more points for collecting coins
+    mp_snakeGame->m_addedScoreNumber = 3;
 }
 
 void Chest::disableBoostEffect()
@@ -216,7 +204,8 @@ void Chest::disableBoostEffect()
     // create new random food
     mp_snakeGame->addRandomFood();
 
-    int deb = 0;
+    // reset points for collecting food
+    mp_snakeGame->m_addedScoreNumber = 1;
 }
 
 void Chest::update()
@@ -237,4 +226,18 @@ void Chest::update()
 void Chest::draw()
 {
     PowerUp::draw();
+
+    // draw fuse
+    if( _BOOST == m_state )
+    {
+        clock_t end         = clock();
+        float elapsedTime   = ( float )( end - m_timer ) / CLOCKS_PER_SEC;
+
+        float timeLeftPerc = 1 - ( elapsedTime / m_boostTime );
+
+        const int length = ( int )( ( mp_snakeGame->m_gameImg.cols - 10 ) * timeLeftPerc );
+        cv::Point2i p1( 5, 5 );
+        cv::Point2i p2( 5 + length, 5 );
+        cv::line( mp_snakeGame->m_gameImg, p1, p2, RED, 4 );
+    }
 }

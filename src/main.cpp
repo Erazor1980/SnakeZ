@@ -39,9 +39,9 @@ int main()
     std::vector< PowerUp* > vPowerUps;
     PowerUp* myRocket = new Rocket( "rocket", cv::imread( PATH_TO_IMAGES + "rocket.png", 1 ), lifeTime, boostTime,
                                   PATH_TO_SOUNDS + "rocketShowUp.wav", PATH_TO_SOUNDS + "rocketConsume.wav" );
-    //vPowerUps.push_back( myRocket );
+    vPowerUps.push_back( myRocket );
 
-    PowerUp* myChest = new Chest( "chest", cv::imread( PATH_TO_IMAGES + "chest.png", 1 ), lifeTime, boostTime,
+    PowerUp* myChest = new Chest( "chest", cv::imread( PATH_TO_IMAGES + "chest.png", 1 ), 15, 25,
                                    PATH_TO_SOUNDS + "fanfare.wav", PATH_TO_SOUNDS + "floop.wav" );
     vPowerUps.push_back( myChest );
 
