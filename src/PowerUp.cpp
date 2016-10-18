@@ -215,13 +215,17 @@ void Chest::enableBoostEffect()
 
 void Chest::disableBoostEffect()
 {
-    // remove all coins
-    mp_snakeGame->m_vFoodInGame.clear();
+    const int numFood = (int)mp_snakeGame->m_vFoodInGame.size();
 
-    // create new random food
-    mp_snakeGame->addRandomFood();
+    if( numFood > 0 )
+    {
+        if( mp_snakeGame->m_vFoodInGame[ numFood - 1 ].getName() == "coin" )
+        {
+            // remove all coins
+            mp_snakeGame->m_vFoodInGame.clear();
+        }
+    }
 
-    // reset points for collecting food
     mp_snakeGame->m_addedScoreNumber--;
 }
 

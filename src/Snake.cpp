@@ -220,8 +220,11 @@ void SnakeGame::resetGame()
     {
         if( m_vPowerUps[ i ]->getName() == "chest" )
         {
-            //m_vPowerUps[ i ]->init( this, 25, 30 );
+#if DEBUG_MODE
             m_vPowerUps[ i ]->init( this, 1, 1 );
+#else
+            m_vPowerUps[ i ]->init( this, 25, 30 );
+#endif
         }
         else
         {

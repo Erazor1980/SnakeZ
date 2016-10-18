@@ -77,8 +77,7 @@ private:
     int m_currPlayerIdx         = 0;
 
     std::vector< PowerUp* >     m_vPowerUps;
-    //int m_currPowerUp           = 0;
-
+    
     // food
     std::vector< cv::Mat >      m_vFoodImg;
     std::vector< std::string >  m_vFoodSounds;

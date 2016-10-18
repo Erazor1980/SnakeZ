@@ -41,8 +41,13 @@ int main()
                                   PATH_TO_SOUNDS + "rocketShowUp.wav", PATH_TO_SOUNDS + "rocketConsume.wav" );
     vPowerUps.push_back( myRocket );
 
+#if DEBUG_MODE
+    PowerUp* myChest = new Chest( "chest", cv::imread( PATH_TO_IMAGES + "chest.png", 1 ), 15, 5,
+                                  PATH_TO_SOUNDS + "fanfare.wav", PATH_TO_SOUNDS + "floop.wav" );
+#else
     PowerUp* myChest = new Chest( "chest", cv::imread( PATH_TO_IMAGES + "chest.png", 1 ), 15, 25,
                                    PATH_TO_SOUNDS + "fanfare.wav", PATH_TO_SOUNDS + "floop.wav" );
+#endif
     vPowerUps.push_back( myChest );
 
     
