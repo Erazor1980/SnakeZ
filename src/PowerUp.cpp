@@ -169,7 +169,15 @@ void Rocket::draw()
         clock_t end         = clock();
         float elapsedTime   = ( float )( end - m_timer ) / CLOCKS_PER_SEC;
 
-        float timeLeftPerc = 1 - ( elapsedTime / m_boostTime );
+        float timeLeftPerc = 0;
+        if( m_timer > 0 )
+        {
+            timeLeftPerc = 1 - ( elapsedTime / m_boostTime );
+        }
+        else
+        {
+            timeLeftPerc = 1;
+        }
 
         const int length = ( int )( mp_snakeGame->m_tileSize * timeLeftPerc );
         cv::Point2i p1( mp_snakeGame->m_headPos.x * mp_snakeGame->m_tileSize, mp_snakeGame->m_headPos.y * mp_snakeGame->m_tileSize );
@@ -243,8 +251,16 @@ void Chest::draw()
         clock_t end         = clock();
         float elapsedTime   = ( float )( end - m_timer ) / CLOCKS_PER_SEC;
 
-        float timeLeftPerc = 1 - ( elapsedTime / m_boostTime );
-
+        float timeLeftPerc = 0;
+        if( m_timer > 0 )
+        {
+            timeLeftPerc = 1 - ( elapsedTime / m_boostTime );
+        }
+        else
+        {
+            timeLeftPerc = 1;
+        }
+        
         const int length = ( int )( ( mp_snakeGame->m_gameImg.cols - 10 ) * timeLeftPerc );
         cv::Point2i p1( 5, 5 );
         cv::Point2i p2( 5 + length, 5 );

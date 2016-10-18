@@ -188,12 +188,13 @@ void SnakeGame::resetGame()
     m_vFoodInGame.clear();
     addRandomFood();
 
-    m_headPos       = cv::Point2i( m_tilesX / 2, m_tilesY / 2 );
-    m_movDir        = RIGHT;
-    m_lastDir       = RIGHT;
-    m_numTailParts  = 0;
-    m_bGameOver     = false;
-    m_score         = 0;
+    m_headPos           = cv::Point2i( m_tilesX / 2, m_tilesY / 2 );
+    m_movDir            = RIGHT;
+    m_lastDir           = RIGHT;
+    m_numTailParts      = 0;
+    m_bGameOver         = false;
+    m_score             = 0;
+    m_addedScoreNumber  = 1;
 
     if( mp_tailParts )
     {
@@ -219,8 +220,8 @@ void SnakeGame::resetGame()
     {
         if( m_vPowerUps[ i ]->getName() == "chest" )
         {
-            m_vPowerUps[ i ]->init( this, 25, 30 );
-            //m_vPowerUps[ i ]->init( this, 1, 1 );
+            //m_vPowerUps[ i ]->init( this, 25, 30 );
+            m_vPowerUps[ i ]->init( this, 1, 1 );
         }
         else
         {
@@ -506,8 +507,8 @@ void SnakeGame::drawScene()
     int fontFace = cv::FONT_HERSHEY_PLAIN;
     double fontScale = 1.5;
     int fontThickness = 2;
-    char pts[ 10 ];
-    sprintf_s( pts, "%d", m_score );
+    char pts[ 200 ];
+    sprintf_s( pts, "%d (%d)", m_score, m_numTailParts );
     cv::putText( m_gameImg, pts, cv::Point( 10, 25 ), fontFace, fontScale, RED, fontThickness );
 
     // draw power ups

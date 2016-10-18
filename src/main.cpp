@@ -8,7 +8,7 @@ int main()
     vFoodImg.push_back( cv::imread( PATH_TO_IMAGES + "chicken.png", 1 ) );
     vFoodImg.push_back( cv::imread( PATH_TO_IMAGES + "iceCream.png", 1 ) );
     vFoodImg.push_back( cv::imread( PATH_TO_IMAGES + "soap.png", 1 ) );
-    vFoodImg.push_back( cv::imread( PATH_TO_IMAGES + "coin.png", 1 ) );     // HAS TO BE LAST!!!!
+    vFoodImg.push_back( cv::imread( PATH_TO_IMAGES + "gold.png", 1 ) );     // HAS TO BE LAST!!!!
 
     std::vector< std::string > vFoodSounds;
     vFoodSounds.push_back( PATH_TO_SOUNDS + "papaKauen.wav" );
