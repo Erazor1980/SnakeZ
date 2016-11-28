@@ -196,6 +196,8 @@ void SnakeGame::resetGame()
     m_score             = 0;
     m_addedScoreNumber  = 1;
 
+    m_numGoldFromChest  = 5;
+
     if( mp_tailParts )
     {
         delete[] mp_tailParts;

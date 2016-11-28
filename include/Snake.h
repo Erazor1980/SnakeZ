@@ -83,6 +83,8 @@ private:
     std::vector< std::string >  m_vFoodSounds;
     std::vector< Food >         m_vFoodInGame;
 
+    int                         m_numGoldFromChest = 5;
+
     // images 
     cv::Mat m_tailImg;
     cv::Mat m_gameImg;

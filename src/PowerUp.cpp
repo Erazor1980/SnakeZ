@@ -203,7 +203,7 @@ void Chest::enableBoostEffect()
     // create coins
     const int idx = (int)mp_snakeGame->m_vFoodImg.size() - 1;    // coin is last in the foodImg- and foodSound vector!
 
-    for( int i = 0; i < NEW_FOOD_FROM_CHEST; ++i )
+    for( int i = 0; i < mp_snakeGame->m_numGoldFromChest; ++i )
     {
         Food coin( &mp_snakeGame->m_vFoodImg[ idx ], "coin", mp_snakeGame->findFreeTile(), mp_snakeGame->m_vFoodSounds[ idx ] );
         mp_snakeGame->m_vFoodInGame.push_back( coin );
@@ -223,6 +223,12 @@ void Chest::disableBoostEffect()
         {
             // remove all coins
             mp_snakeGame->m_vFoodInGame.clear();
+            mp_snakeGame->m_numGoldFromChest--;
+
+            if( mp_snakeGame->m_numGoldFromChest < 1 )
+            {
+                mp_snakeGame->m_numGoldFromChest = 1;
+            }
         }
     }
 
@@ -241,6 +247,7 @@ void Chest::update()
             m_timer = -1;
             m_state = _WAIT;
             disableBoostEffect();
+            mp_snakeGame->m_numGoldFromChest++;
         }
     }
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "defines.h"
 
-#define NEW_FOOD_FROM_CHEST (5)
+//#define NEW_FOOD_FROM_CHEST (5)
 
 class SnakeGame;
 

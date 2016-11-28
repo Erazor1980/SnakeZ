@@ -22,6 +22,7 @@ int main()
     vPlayerImg.push_back( cv::imread( PATH_TO_IMAGES + "melina.png", 1 ) );
     vPlayerImg.push_back( cv::imread( PATH_TO_IMAGES + "mama.png", 1 ) );
     vPlayerImg.push_back( cv::imread( PATH_TO_IMAGES + "papa.png", 1 ) );
+    vPlayerImg.push_back( cv::imread( PATH_TO_IMAGES + "martin.png", 1 ) );
 
     // add player names
     std::vector< std::string > vPlayerNames;
@@ -29,6 +30,7 @@ int main()
     vPlayerNames.push_back( "MELINA" );
     vPlayerNames.push_back( "MAMA" );
     vPlayerNames.push_back( "PAPA" );
+    vPlayerNames.push_back( "MARTIN" );
 
     /*Rocket test( "rocket", cv::imread( PATH_TO_IMAGES + "rocket.png", 1 ), 11, 12,
                  PATH_TO_SOUNDS + "rocketShowUp.wav", PATH_TO_SOUNDS + "rocketConsume.wav" );*/

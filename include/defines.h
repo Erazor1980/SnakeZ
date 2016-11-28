@@ -21,7 +21,7 @@
 #define CYAN    cv::Scalar( 255, 255, 0 )
 
 #define DEBUG_INFOS (0)
-#define DEBUG_MODE (0)
+#define DEBUG_MODE (1)
 
 // paths
 #define PATH_TO_IMAGES      std::string("D:\\Projects\\_images_\\")
